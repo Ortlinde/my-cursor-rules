@@ -1,0 +1,46 @@
+---
+description: Postmortem knowledge base - Bug patterns database mandate
+alwaysApply: true
+---
+
+# Postmortem Knowledge Base
+
+> **Purpose**: Record historical bug patterns to prevent regressions.
+> **Note**: For the "Risk Avoidance Checklist", refer to the `self-review` skill.
+
+## Knowledge Base Location
+
+- [ ] **MUST**: Historical bug patterns are stored in `.cursor/postmortem/`
+  - 📂 Database Path: `.cursor/postmortem/`
+  - 📋 Structure:
+    - `categories/` - Bug patterns by category
+    - `changelists/` - Detailed analysis by CL number
+
+## Database Search Mandate
+
+### When to Search
+- [ ] **MUST**: Search `.cursor/postmortem/` when modifying code in these areas:
+
+| Code Area | Search Location | Keywords |
+|-----------|----------------|----------|
+| Unity lifecycle (`Awake`, `Start`) | `categories/unity-lifecycle.md` | "lifecycle", "order" |
+| Unity Editor (`EditorWindow`) | `categories/unity-editor.md` | "scene loading", "SetDirty" |
+| Coroutines (`StartCoroutine`) | `categories/async-patterns.md` | "coroutine", "yield" |
+| Event subscriptions (`+=`) | `categories/memory-management.md` | "event", "leak" |
+| `GetComponent`, `Find` | `categories/memory-management.md` | "cache", "Find" |
+| Architecture changes | `categories/architecture.md` | "dependency", "circular" |
+
+### How to Search
+- [ ] **MUST**: Use `grep` tool to search postmortem database.
+  ```
+  grep "Awake" -i path:.cursor/postmortem/categories/unity-lifecycle.md
+  ```
+- [ ] **MUST**: Review search results before completing code changes.
+- [ ] **MUST**: Report matches in the Self-Analysis Report (via `self-review` skill).
+
+## Adding New Patterns
+
+When a new bug is discovered:
+1. **Document**: Add to `.cursor/postmortem/categories/`.
+2. **Analysis**: Add to `.cursor/postmortem/changelists/`.
+3. **Update Skill**: Add key prevention steps to `self-review/references/risk-checklist.md`.

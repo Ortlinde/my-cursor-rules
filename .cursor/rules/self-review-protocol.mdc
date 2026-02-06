@@ -1,0 +1,63 @@
+---
+description: AI Self-Review Protocol - Mandatory trigger for code review via subagent
+globs: .cs
+alwaysApply: true
+---
+
+# AI Self-Review Protocol (MANDATORY)
+
+> **Core Principle**: AI MUST delegate code review to the `code-reviewer` subagent after code generation.
+
+## Trigger Conditions
+
+**MUST** delegate to `code-reviewer` subagent when ANY of the following occurs:
+- Modified or added >50 lines of code
+- Refactored existing functionality
+- Added new class, method, or interface
+- Modified architecture or dependencies
+- Touched Unity lifecycle or event system
+- Made unsolicited optimizations
+
+## Execution Protocol
+
+1. **Delegate**: Use the Task tool to invoke `code-reviewer` subagent with `readonly: true`.
+2. **Wait**: Subagent performs Risk & Compliance Check.
+3. **Receive**: Subagent returns "Self-Analysis Report".
+4. **Act**: Follow subagent's recommendations (Proceed / Warning / STOP).
+
+### Task Tool Parameters
+
+| Parameter | Value | Reason |
+|-----------|-------|--------|
+| `subagent_type` | `code-reviewer` | 使用專屬審查 agent |
+| `readonly` | `true` | 審查只需讀取，不需寫入 |
+| `model` | `fast` | 審查任務適合快速模型 |
+
+### Example Delegation
+
+```
+Use the code-reviewer subagent (readonly) to review the changes made to [file(s)].
+Context: [Brief description of changes]
+```
+
+## Mandatory Stop Conditions
+
+**MUST** STOP code generation and discuss with user when subagent reports:
+- Failed checks >= 3
+- Triggered known bug pattern (Postmortem)
+- Modified >5 files without explicit authorization
+- Violated SOLID principles with no immediate fix
+- Introduced new external dependencies
+
+## Enforcement
+
+- **MUST**: Delegate review before finalizing response.
+- **MUST NOT**: Submit code without subagent review report if triggered.
+- **Verification**: User will check if "Self-Analysis Report" is present.
+
+## Benefits of Subagent Delegation
+
+- Main agent remains focused on implementation tasks
+- Code review runs in isolated context
+- Consistent, standardized review process
+- Clear separation of concerns

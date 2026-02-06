@@ -1,0 +1,128 @@
+---
+description: Base coding rule for ai.
+globs: 
+alwaysApply: true
+---
+
+# Base Coding Rules (ENFORCED)
+
+> **Note**: For detailed Unity Style Guides, Architecture Patterns, and Refactoring strategies, refer to the `coding-standards` skill.
+
+## Environment Requirements
+
+- [ ] **MUST**: Use CRLF line endings for all files
+  - 🎯 Context: Windows environment requirement
+  - ✅ Action: Ensure all files end with CRLF (\r\n)
+  - ❌ Violation: Files with LF (\n) only
+  - ✅ Pass: Files with CRLF line endings
+
+- [ ] **MUST NOT**: Use graphical characters in executable code
+  - 🎯 Context: Unity cannot display non-ASCII characters properly
+  - ❌ Violation: Comments with emoji, box-drawing, Unicode art, or any non-ASCII characters
+  - ❌ Violation: String literals with emoji or special Unicode characters
+  - ✅ Pass: Pure ASCII text in all code, comments, and string literals
+
+---
+
+## MUST Requirements (Violations = Blocking)
+
+### File & Class Structure
+
+- [ ] **MUST**: One public class per file
+  - ❌ Violation: Multiple public classes in `Example.cs`
+  - ✅ Pass: Single public class per `.cs` file
+
+- [ ] **MUST**: One concept per class
+  - ❌ Violation: `UserManagerValidator` (Mixed responsibilities)
+  - ✅ Pass: `UserValidator` (Single responsibility)
+
+- [ ] **MUST**: One behavior per method
+  - ❌ Violation: `ProcessAndSaveData()`
+  - ✅ Pass: `ProcessData()` + `SaveData()`
+
+### Code Quality Standards
+
+- [ ] **MUST**: File length ≤ 200 lines
+  - 📏 Count: Exclude blank lines and comments
+  - ❌ Violation: File with 201+ lines
+  - ✅ Pass: File with ≤ 200 lines
+
+- [ ] **MUST**: Method parameters ≤ 3
+  - 📏 Count: Constructor and method parameters
+  - ❌ Violation: `Initialize(a, b, c, d)`
+  - ✅ Pass: `Initialize(config)`
+
+- [ ] **MUST**: Follow SOLID principles
+  - Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, Dependency Inversion.
+  - 💡 **See `coding-standards` skill for implementation patterns.**
+
+- [ ] **MUST**: Follow DRY (Don't Repeat Yourself)
+  - ❌ Violation: Identical logic copied across 3+ locations.
+
+### Scope Control
+
+- [ ] **MUST**: When user explicitly specifies modification scope, do NOT modify outside that scope
+  - 🎯 Trigger: User highlights/mentions specific method + says "only modify this method"
+  - ❌ Violation: User marks `CalculateScore()`, AI also modifies `ValidateInput()`
+  - 💡 **Assumption**: User's scope declaration means they believe the task is completable within that scope.
+
+---
+
+## SHOULD Guidelines (Triggers for `coding-standards` Skill)
+
+If the following thresholds are exceeded, invoke `coding-standards` skill for refactoring guidance:
+
+- [ ] **SHOULD**: Extract methods when logic exceeds 20 lines.
+- [ ] **SHOULD**: Split large classes when > 150 lines or 5+ unrelated methods.
+- [ ] **SHOULD**: Avoid if/else/switch for complex type logic (Use Strategy/Factory patterns).
+
+---
+
+## MUST NOT Requirements (Strict Prohibitions)
+
+- [ ] **MUST NOT**: Generate code without explicit user instruction
+  - ❌ Prohibited: "I also added X for convenience"
+  - ✅ Allowed: "Should I also add X?"
+
+- [ ] **MUST NOT**: Introduce >3 new concepts per iteration (unless explicitly instructed)
+  - 📏 Count: New classes, interfaces, patterns combined
+  - ❌ Violation: Adding 5 new classes unprompted
+  - ✅ Pass: Adding 2 new classes, then confirming before more
+
+- [ ] **MUST NOT**: Auto-generate ideas without approval
+  - ❌ Prohibited: Unsolicited refactoring suggestions
+  - ✅ Allowed: "I noticed X. Would you like me to improve it?"
+
+---
+
+## Quantified Standards Summary
+
+| Metric | Limit | Tolerance | Blocking |
+|--------|-------|-----------|----------|
+| File length | ≤ 200 lines | 210 lines | 250+ lines |
+| Method params | ≤ 3 | 4 (if justified) | 5+ params |
+| Method length | ≤ 20 lines | 25 lines | 40+ lines |
+| New concepts | ≤ 3 per turn* | 4 (if related) | 5+ unprompted |
+| Code duplication | <3 occurrences | 3 occurrences | 4+ occurrences |
+| if/else branches | ≤ 3 branches | 3-4 branches | 5+ branches |
+
+*Exception: When user explicitly requests specific number (e.g., "split into 5 classes")
+
+---
+
+## Enforcement Priority
+
+1. **🔴 Blocking Issues** (MUST fix before proceeding)
+   - Modified code outside user-specified scope
+   - File >250 lines
+   - Method >5 parameters
+   - Violated SOLID principles
+
+2. **🟡 Warning Issues** (SHOULD address via `coding-standards`)
+   - File 200-250 lines
+   - Method 4 parameters
+   - Method >25 lines
+
+3. **🟢 Advisory Issues** (Consider improving)
+   - File 150-200 lines
+   - Opportunities for design patterns
