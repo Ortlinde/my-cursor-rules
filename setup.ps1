@@ -1,19 +1,17 @@
 <#
 .SYNOPSIS
-    Cursor Rules 自動設定腳本
+    Cursor Rules Auto Setup Script
 .DESCRIPTION
-    自動安裝官方 OpenSkills 並套用自訂規則
+    Auto install official OpenSkills and apply custom rules
 .PARAMETER Target
-    目標專案路徑（預設為當前目錄）
+    Target project path (default: current directory)
 .PARAMETER SkipOpenSkills
-    跳過官方 OpenSkills 安裝（僅套用自訂規則）
+    Skip official OpenSkills installation (only apply custom rules)
 .EXAMPLE
     .\setup.ps1 -Target "D:\Workspace\NewProject"
 .EXAMPLE
-    # 在目標專案目錄中執行
     irm https://raw.githubusercontent.com/Ortlinde/my-cursor-rules/main/setup.ps1 | iex
 .EXAMPLE
-    # 跳過 OpenSkills，僅套用自訂規則
     .\setup.ps1 -SkipOpenSkills
 #>
 
@@ -25,22 +23,22 @@ param(
 $ErrorActionPreference = "Continue"
 
 # ============================================================
-# 顯示 Banner
+# Banner
 # ============================================================
 Write-Host @"
 
-  ╔══════════════════════════════════════════════════════════════╗
-  ║           Cursor Rules 自動設定腳本 v1.1                     ║
-  ║           https://github.com/Ortlinde/my-cursor-rules        ║
-  ╚══════════════════════════════════════════════════════════════╝
+  +==============================================================+
+  |           Cursor Rules Auto Setup v1.1                       |
+  |           https://github.com/Ortlinde/my-cursor-rules        |
+  +==============================================================+
 
 "@ -ForegroundColor Cyan
 
-Write-Host "目標目錄: $Target" -ForegroundColor Gray
+Write-Host "Target: $Target" -ForegroundColor Gray
 Write-Host ""
 
 # ============================================================
-# 依賴檢查函數
+# Dependency Check Functions
 # ============================================================
 function Test-Command {
     param([string]$Command)
@@ -66,29 +64,29 @@ function Get-CommandVersion {
 }
 
 # ============================================================
-# 步驟 0: 依賴檢查
+# Step 0: Dependency Check
 # ============================================================
-Write-Host "🔍 [0/4] 檢查系統依賴..." -ForegroundColor Yellow
+Write-Host "[0/4] Checking dependencies..." -ForegroundColor Yellow
 Write-Host ""
 
 $dependencies = @{
     "Git" = @{
         Command = "git"
         Required = $true
-        Purpose = "下載規則 repo"
+        Purpose = "Clone rules repo"
         InstallUrl = "https://git-scm.com/downloads"
     }
     "Node.js" = @{
         Command = "node"
         Required = $false
-        Purpose = "執行 OpenSkills (npx)"
+        Purpose = "Run OpenSkills (npx)"
         InstallUrl = "https://nodejs.org/"
     }
     "npm" = @{
         Command = "npm"
         Required = $false
-        Purpose = "執行 OpenSkills (npx)"
-        InstallUrl = "隨 Node.js 一起安裝"
+        Purpose = "Run OpenSkills (npx)"
+        InstallUrl = "Installed with Node.js"
     }
 }
 
@@ -101,16 +99,13 @@ foreach ($name in $dependencies.Keys) {
     
     if ($exists) {
         $version = Get-CommandVersion $dep.Command
-        Write-Host "  ✅ $name" -ForegroundColor Green -NoNewline
-        Write-Host " ($version)" -ForegroundColor Gray
+        Write-Host "  [OK] $name ($version)" -ForegroundColor Green
     } else {
         if ($dep.Required) {
-            Write-Host "  ❌ $name" -ForegroundColor Red -NoNewline
-            Write-Host " (必要 - $($dep.Purpose))" -ForegroundColor Red
+            Write-Host "  [X] $name (Required - $($dep.Purpose))" -ForegroundColor Red
             $missingRequired += @{ Name = $name; Url = $dep.InstallUrl }
         } else {
-            Write-Host "  ⚠️ $name" -ForegroundColor Yellow -NoNewline
-            Write-Host " (可選 - $($dep.Purpose))" -ForegroundColor Yellow
+            Write-Host "  [!] $name (Optional - $($dep.Purpose))" -ForegroundColor Yellow
             $missingOptional += @{ Name = $name; Url = $dep.InstallUrl }
         }
     }
@@ -118,86 +113,85 @@ foreach ($name in $dependencies.Keys) {
 
 Write-Host ""
 
-# 必要依賴缺失，終止
+# Required dependency missing - abort
 if ($missingRequired.Count -gt 0) {
-    Write-Host "❌ 缺少必要依賴，無法繼續安裝：" -ForegroundColor Red
+    Write-Host "[X] Missing required dependencies:" -ForegroundColor Red
     Write-Host ""
     foreach ($missing in $missingRequired) {
         Write-Host "  $($missing.Name)" -ForegroundColor Red
-        Write-Host "    下載: $($missing.Url)" -ForegroundColor Gray
+        Write-Host "    Download: $($missing.Url)" -ForegroundColor Gray
     }
     Write-Host ""
-    Write-Host "請安裝上述依賴後重新執行此腳本。" -ForegroundColor Yellow
+    Write-Host "Please install the above dependencies and re-run this script." -ForegroundColor Yellow
     exit 1
 }
 
-# 可選依賴缺失，警告
+# Optional dependency missing - warn
 if ($missingOptional.Count -gt 0) {
-    Write-Host "⚠️ 部分可選依賴未安裝：" -ForegroundColor Yellow
+    Write-Host "[!] Some optional dependencies not installed:" -ForegroundColor Yellow
     foreach ($missing in $missingOptional) {
         Write-Host "  $($missing.Name) - $($missing.Url)" -ForegroundColor Gray
     }
     Write-Host ""
     
-    # 檢查是否缺少 Node.js/npm
+    # Check if Node.js/npm missing
     $hasNode = Test-Command "node"
     $hasNpm = Test-Command "npm"
     
     if (-not $hasNode -or -not $hasNpm) {
-        Write-Host "  由於缺少 Node.js/npm，將跳過官方 OpenSkills 安裝。" -ForegroundColor Yellow
-        Write-Host "  您仍可使用自訂規則，但官方 skills (docx, xlsx 等) 將無法使用。" -ForegroundColor Yellow
+        Write-Host "  Node.js/npm not found. Skipping official OpenSkills." -ForegroundColor Yellow
+        Write-Host "  Custom rules will still work, but official skills (docx, xlsx, etc.) unavailable." -ForegroundColor Yellow
         Write-Host ""
         $SkipOpenSkills = $true
     }
 }
 
 # ============================================================
-# 確認目標目錄存在
+# Verify target directory exists
 # ============================================================
 if (-not (Test-Path $Target)) {
-    Write-Host "❌ 目標目錄不存在: $Target" -ForegroundColor Red
+    Write-Host "[X] Target directory does not exist: $Target" -ForegroundColor Red
     exit 1
 }
 
 # ============================================================
-# 步驟 1: 安裝官方 OpenSkills (17 個)
+# Step 1: Install official OpenSkills (17)
 # ============================================================
-Write-Host "📦 [1/4] 安裝官方 OpenSkills..." -ForegroundColor Yellow
+Write-Host "[1/4] Installing official OpenSkills..." -ForegroundColor Yellow
 
 if ($SkipOpenSkills) {
-    Write-Host "  ⏭️ 已跳過（缺少 Node.js 或使用 -SkipOpenSkills 參數）" -ForegroundColor Gray
+    Write-Host "  [Skip] (No Node.js or -SkipOpenSkills flag)" -ForegroundColor Gray
 } else {
     Push-Location $Target
     try {
-        # 初始化 openskills（如果還沒有）
+        # Init openskills if not exists
         if (-not (Test-Path ".claude\skills")) {
-            Write-Host "  執行 openskills init..." -ForegroundColor Gray
+            Write-Host "  Running openskills init..." -ForegroundColor Gray
             $initResult = npx openskills init --yes 2>&1
             if ($LASTEXITCODE -ne 0) {
-                Write-Host "  ⚠️ openskills init 失敗" -ForegroundColor Yellow
-                Write-Host "  $initResult" -ForegroundColor Gray
+                Write-Host "  [!] openskills init failed" -ForegroundColor Yellow
             }
         }
         
-        # 同步官方 skills
-        Write-Host "  執行 openskills sync..." -ForegroundColor Gray
+        # Sync official skills
+        Write-Host "  Running openskills sync..." -ForegroundColor Gray
         $syncResult = npx openskills sync 2>&1
         if ($LASTEXITCODE -eq 0) {
-            Write-Host "  ✅ 官方 Skills 安裝完成 (17 個)" -ForegroundColor Green
+            Write-Host "  [OK] Official Skills installed (17)" -ForegroundColor Green
         } else {
-            Write-Host "  ⚠️ openskills sync 失敗，繼續其他步驟..." -ForegroundColor Yellow
+            Write-Host "  [!] openskills sync failed, continuing..." -ForegroundColor Yellow
         }
     } catch {
-        Write-Host "  ⚠️ OpenSkills 安裝失敗: $_" -ForegroundColor Yellow
+        Write-Host "  [!] OpenSkills installation failed: $_" -ForegroundColor Yellow
     }
     Pop-Location
 }
 
 # ============================================================
-# 步驟 2: 下載自訂規則
+# Step 2: Download custom rules
 # ============================================================
 Write-Host ""
-Write-Host "📥 [2/4] 下載自訂規則..." -ForegroundColor Yellow
+Write-Host "[2/4] Downloading custom rules..." -ForegroundColor Yellow
 
 $repoUrl = "https://github.com/Ortlinde/my-cursor-rules"
 $tempDir = Join-Path $env:TEMP "cursor-rules-$(Get-Date -Format 'yyyyMMddHHmmss')"
@@ -205,36 +199,36 @@ $tempDir = Join-Path $env:TEMP "cursor-rules-$(Get-Date -Format 'yyyyMMddHHmmss'
 $cloneOutput = git clone --depth 1 $repoUrl $tempDir 2>&1
 
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "  ❌ Clone 失敗" -ForegroundColor Red
+    Write-Host "  [X] Clone failed" -ForegroundColor Red
     Write-Host "  $cloneOutput" -ForegroundColor Gray
     Write-Host ""
-    Write-Host "可能原因：" -ForegroundColor Yellow
-    Write-Host "  - 網路連線問題" -ForegroundColor Gray
-    Write-Host "  - GitHub 無法存取" -ForegroundColor Gray
-    Write-Host "  - 防火牆阻擋" -ForegroundColor Gray
+    Write-Host "Possible causes:" -ForegroundColor Yellow
+    Write-Host "  - Network connection issue" -ForegroundColor Gray
+    Write-Host "  - GitHub unreachable" -ForegroundColor Gray
+    Write-Host "  - Firewall blocking" -ForegroundColor Gray
     exit 1
 }
-Write-Host "  ✅ 下載完成" -ForegroundColor Green
+Write-Host "  [OK] Download complete" -ForegroundColor Green
 
 # ============================================================
-# 步驟 3: 套用 .cursor 規則（完整覆蓋）
+# Step 3: Apply .cursor rules (full overwrite)
 # ============================================================
 Write-Host ""
-Write-Host "📋 [3/4] 套用 .cursor 規則..." -ForegroundColor Yellow
+Write-Host "[3/4] Applying .cursor rules..." -ForegroundColor Yellow
 
-# 複製 .cursor（rules, agents, postmortem）
+# Copy .cursor (rules, agents, postmortem)
 if (Test-Path "$tempDir\.cursor") {
     Copy-Item -Path "$tempDir\.cursor" -Destination $Target -Recurse -Force
-    Write-Host "  ✅ .cursor/rules/ (4 個規則檔)" -ForegroundColor Green
-    Write-Host "  ✅ .cursor/agents/ (code-reviewer)" -ForegroundColor Green
-    Write-Host "  ✅ .cursor/postmortem/ (bug patterns 知識庫)" -ForegroundColor Green
+    Write-Host "  [OK] .cursor/rules/ (4 rule files)" -ForegroundColor Green
+    Write-Host "  [OK] .cursor/agents/ (code-reviewer)" -ForegroundColor Green
+    Write-Host "  [OK] .cursor/postmortem/ (bug patterns)" -ForegroundColor Green
 }
 
 # ============================================================
-# 步驟 4: 套用自訂 Skills（合併，不覆蓋官方）
+# Step 4: Apply custom Skills (merge, don't overwrite official)
 # ============================================================
 Write-Host ""
-Write-Host "🔧 [4/4] 套用自訂 Skills..." -ForegroundColor Yellow
+Write-Host "[4/4] Applying custom Skills..." -ForegroundColor Yellow
 
 $customSkills = @("coding-standards", "self-review")
 
@@ -243,93 +237,93 @@ foreach ($skill in $customSkills) {
     if (Test-Path $skillPath) {
         $destPath = Join-Path $Target ".claude\skills\$skill"
         
-        # 確保目標目錄存在
+        # Ensure target directory exists
         $parentDir = Split-Path $destPath -Parent
         if (-not (Test-Path $parentDir)) {
             New-Item -ItemType Directory -Path $parentDir -Force | Out-Null
         }
         
         Copy-Item -Path $skillPath -Destination (Split-Path $destPath -Parent) -Recurse -Force
-        Write-Host "  ✅ $skill" -ForegroundColor Green
+        Write-Host "  [OK] $skill" -ForegroundColor Green
     }
 }
 
 # ============================================================
-# 步驟 5: 重新同步 AGENTS.md（如果有 npm）
+# Step 5: Re-sync AGENTS.md (if npm available)
 # ============================================================
 if (-not $SkipOpenSkills) {
     Write-Host ""
-    Write-Host "🔄 重新同步 Skills 列表..." -ForegroundColor Yellow
+    Write-Host "Re-syncing Skills list..." -ForegroundColor Yellow
     
     Push-Location $Target
     try {
         $syncResult = npx openskills sync 2>&1
         if ($LASTEXITCODE -eq 0) {
-            Write-Host "  ✅ AGENTS.md 已更新" -ForegroundColor Green
+            Write-Host "  [OK] AGENTS.md updated" -ForegroundColor Green
         } else {
-            Write-Host "  ⚠️ 同步失敗" -ForegroundColor Yellow
+            Write-Host "  [!] Sync failed" -ForegroundColor Yellow
         }
     } catch {
-        Write-Host "  ⚠️ 同步失敗" -ForegroundColor Yellow
+        Write-Host "  [!] Sync failed" -ForegroundColor Yellow
     }
     Pop-Location
 } else {
-    # 沒有 OpenSkills，直接複製 AGENTS.md
+    # No OpenSkills, just copy AGENTS.md
     if (Test-Path "$tempDir\AGENTS.md") {
         Copy-Item -Path "$tempDir\AGENTS.md" -Destination $Target -Force
         Write-Host ""
-        Write-Host "📄 已複製 AGENTS.md（僅包含自訂 skills）" -ForegroundColor Green
+        Write-Host "[OK] Copied AGENTS.md (custom skills only)" -ForegroundColor Green
     }
 }
 
 # ============================================================
-# 清理
+# Cleanup
 # ============================================================
 Remove-Item -Path $tempDir -Recurse -Force -ErrorAction SilentlyContinue
 
 # ============================================================
-# 完成訊息
+# Done
 # ============================================================
-$openSkillsStatus = if ($SkipOpenSkills) { "❌ 未安裝（缺少 Node.js）" } else { "✅ 已安裝 (17 個)" }
+$openSkillsStatus = if ($SkipOpenSkills) { "[X] Not installed (No Node.js)" } else { "[OK] Installed (17)" }
 
 Write-Host @"
 
-╔══════════════════════════════════════════════════════════════╗
-║                      ✅ 設定完成！                           ║
-╚══════════════════════════════════════════════════════════════╝
++==============================================================+
+|                      Setup Complete!                         |
++==============================================================+
 
-已安裝：
-  📦 官方 OpenSkills: $openSkillsStatus
+Installed:
+  Official OpenSkills: $openSkillsStatus
   
-  📋 自訂 Rules (4 個)
+  Custom Rules (4)
      - enforce-rules.mdc
      - my-base-rules.mdc
      - postmortem-patterns.mdc
      - self-review-protocol.mdc
   
-  🤖 自訂 Agents (1 個)
-     - code-reviewer (Unity/C# 專屬審查)
+  Custom Agents (1)
+     - code-reviewer (Unity/C# review)
   
-  🔧 自訂 Skills (2 個)
-     - coding-standards (Unity 編碼規範)
-     - self-review (自我審查流程)
+  Custom Skills (2)
+     - coding-standards (Unity coding standards)
+     - self-review (Self-review workflow)
   
-  📚 Postmortem 知識庫
-     - Bug patterns 分類與預防
+  Postmortem Knowledge Base
+     - Bug patterns and prevention
 
 "@ -ForegroundColor Cyan
 
 if ($SkipOpenSkills) {
     Write-Host @"
-💡 提示：安裝 Node.js 後可獲得更多功能：
+Tip: Install Node.js for more features:
    https://nodejs.org/
    
-   安裝後執行以下命令啟用官方 Skills：
+   After installation, run:
    npx openskills init --yes
    npx openskills sync
 
 "@ -ForegroundColor Yellow
 }
 
-Write-Host "⚠️  提醒：如果這是團隊專案，請確保 .cursor/ 和 .claude/ 已加入 .gitignore" -ForegroundColor Yellow
+Write-Host "Note: If this is a team project, add .cursor/ and .claude/ to .gitignore" -ForegroundColor Yellow
 Write-Host ""
