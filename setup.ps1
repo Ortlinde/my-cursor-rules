@@ -175,7 +175,7 @@ if ($SkipOpenSkills) {
         
         # Sync official skills
         Write-Host "  Running openskills sync..." -ForegroundColor Gray
-        $syncResult = npx openskills sync 2>&1
+        $syncResult = npx openskills sync --yes 2>&1
         if ($LASTEXITCODE -eq 0) {
             Write-Host "  [OK] Official Skills installed (17)" -ForegroundColor Green
         } else {
@@ -257,7 +257,7 @@ if (-not $SkipOpenSkills) {
     
     Push-Location $Target
     try {
-        $syncResult = npx openskills sync 2>&1
+        $syncResult = npx openskills sync --yes 2>&1
         if ($LASTEXITCODE -eq 0) {
             Write-Host "  [OK] AGENTS.md updated" -ForegroundColor Green
         } else {

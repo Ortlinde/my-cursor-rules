@@ -105,7 +105,7 @@ if "%SKIP_OPENSKILLS%"=="1" (
     )
     
     echo   Running openskills sync...
-    call npx openskills sync >nul 2>&1
+    call npx openskills sync --yes >nul 2>&1
     if %ERRORLEVEL% equ 0 (
         echo   [OK] Official Skills installed ^(17^)
     ) else (
@@ -178,7 +178,7 @@ if "%SKIP_OPENSKILLS%"=="0" (
     echo Re-syncing Skills list...
     
     pushd "%TARGET%"
-    call npx openskills sync >nul 2>&1
+    call npx openskills sync --yes >nul 2>&1
     if %ERRORLEVEL% equ 0 (
         echo   [OK] AGENTS.md updated
     ) else (
