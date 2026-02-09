@@ -76,27 +76,51 @@ AGENTS.md             # Skills 註冊檔（openskills 格式）
 
 當用戶要求同步時，執行以下步驟：
 
-1. **準備同步目錄**
-   ```bash
-   # 建立暫存目錄
-   $syncDir = "d:\Workspace\temp-cursor-rules-sync"
+1. **切換到同步目錄並拉取最新版本**
+   ```powershell
+   # 固定同步目錄（不要每次建立暫存目錄）
+   $syncDir = "d:\Workspace\my-cursor-rules"
+   
+   # 如果目錄不存在，先 clone
+   if (-not (Test-Path $syncDir)) {
+       git clone https://github.com/Ortlinde/my-cursor-rules.git $syncDir
+   }
+   
+   # 切換到目錄並拉取最新版本
+   Set-Location $syncDir
+   git pull origin main
    ```
 
-2. **複製要同步的檔案**
-   - `.cursor/` 目錄
-   - `.claude/` 目錄
-   - `AGENTS.md`
+2. **複製要同步的檔案**（從專案目錄複製到同步目錄）
+   ```powershell
+   $projectDir = "d:\Workspace\DHF2_Unity\Model.Unity"
+   
+   # 複製 .cursor/（排除 skills/ 因為已移至 .claude/skills/）
+   xcopy /E /Y "$projectDir\.cursor\*" "$syncDir\.cursor\"
+   
+   # 複製自訂 skills（僅自訂的，不包含官方 openskills）
+   $customSkills = @("coding-standards", "self-review", "sharelogger-usage", "deliberate-development")
+   foreach ($skill in $customSkills) {
+       xcopy /E /Y "$projectDir\.claude\skills\$skill\*" "$syncDir\.claude\skills\$skill\"
+   }
+   
+   # 複製 AGENTS.md
+   Copy-Item -Path "$projectDir\AGENTS.md" -Destination "$syncDir\AGENTS.md" -Force
+   
+   # 複製 README.md 到 repo 根目錄
+   Copy-Item -Path "$projectDir\.cursor\README.md" -Destination "$syncDir\README.md" -Force
+   ```
 
-3. **更新 README.md**
+3. **更新 README.md**（如有需要）
    - 列出所有 rules
    - 列出所有 agents
    - 列出所有 skills
    - 更新版本號（如果有）
 
 4. **提交並推送**
-   ```bash
-   cd <sync-dir>
-   git add .
+   ```powershell
+   Set-Location $syncDir
+   git add -A
    git commit -m "<commit message>"
    git push origin main
    ```
@@ -159,6 +183,7 @@ readonly: true
 ## GitHub Repo 資訊
 
 - **Repo URL**: https://github.com/Ortlinde/my-cursor-rules
+- **本地同步目錄**: `d:\Workspace\my-cursor-rules`（固定，不要每次建立暫存）
 - **Branch**: main
 - **同步方向**: Local → GitHub（本地優先）
 
@@ -172,9 +197,11 @@ readonly: true
 
 ## 注意事項
 
-1. **本地優先**：本地的修改優先於 repo，同步時會覆蓋 repo
-2. **備份**：同步前建議先 git pull 確認沒有遠端的新更改
-3. **Commit Message 格式**：
+1. **先 Pull 再 Push**：同步前**必須**先 `git pull` 確保本地 repo 是最新版本
+2. **固定目錄**：使用 `d:\Workspace\my-cursor-rules` 作為同步目錄，不要每次建立暫存目錄
+3. **本地優先**：專案中的修改優先於 repo，同步時會覆蓋 repo 內容
+4. **僅同步自訂 Skills**：不要將官方 openskills 同步到 repo
+5. **Commit Message 格式**：
    - `feat: add <name> skill/agent/rule`
    - `fix: update <name> skill/agent/rule`
    - `docs: update README`
