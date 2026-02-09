@@ -1,46 +1,321 @@
 ---
-description: Postmortem knowledge base - Bug patterns database mandate
+description: Postmortem knowledge base - Bug patterns and prevention strategies
 alwaysApply: true
 ---
 
 # Postmortem Knowledge Base
 
-> **Purpose**: Record historical bug patterns to prevent regressions.
-> **Note**: For the "Risk Avoidance Checklist", refer to the `self-review` skill.
+> **Purpose**: Record historical bug patterns to prevent regressions during Vibe Coding.
 
 ## Knowledge Base Location
 
 - [ ] **MUST**: Historical bug patterns are stored in `.cursor/postmortem/`
   - 📂 Database Path: `.cursor/postmortem/`
   - 📋 Structure:
-    - `categories/` - Bug patterns by category
+    - `categories/` - Bug patterns by category (Unity Lifecycle, Unity Editor, Async, Memory, Architecture)
     - `changelists/` - Detailed analysis by CL number
+    - `README.md` - Database overview and workflow
+  - 🎯 This database grows with project experience
+  - 📏 Current file provides common prevention checklist only
 
-## Database Search Mandate
+## Integration with Self-Review Protocol
 
-### When to Search
+- [ ] **MUST**: Check this knowledge base during self-review (Step 2)
+  - 📂 Triggered by: `.cursor/rules/self-review-protocol.mdc`
+  - 🎯 Purpose: Prevent known bug patterns from recurring
+  - ✅ Action: Compare code changes against patterns below
+  - ❌ Violation: If pattern detected, flag in review report
+
+- [ ] **MUST**: Search postmortem database when modifying specific areas
+  - 🔍 Action: Use `grep` or `codebase_search` to query `.cursor/postmortem/`
+  - 📏 Timing: When touching Unity lifecycle, async, memory, or architecture code
+  - ✅ Example: Modifying `Awake()` → Search "Awake" in `.cursor/postmortem/categories/unity-lifecycle.md`
+  - ✅ Example: Adding coroutine → Search "coroutine" in `.cursor/postmortem/categories/`
+
+- [ ] **MUST**: Report pattern matches in self-review report
+  - Format: "Triggered Postmortem [PXXX]: [pattern name] (source: .cursor/postmortem/...)"
+  - Example: "Triggered Postmortem P001: lifecycle order issue (source: .cursor/postmortem/categories/unity-lifecycle.md)"
+
+---
+
+## Common Bug Prevention Checklist
+
+AI MUST check the following common pitfalls when generating code:
+
+### Unity-Specific Risks
+
+- [ ] **Null Reference Exceptions**
+  - ✅ Check: GetComponent results are null-checked
+  - ❌ Bad: `GetComponent<Rigidbody>().velocity = ...`
+  - ✅ Good: `var rb = GetComponent<Rigidbody>(); if (rb != null) rb.velocity = ...`
+
+- [ ] **Lifecycle Order Issues**
+  - ✅ Check: Awake/Start/OnEnable execution order respected
+  - ❌ Bad: Accessing other component's data in Awake before it's initialized
+  - ✅ Good: Initialize self in Awake, reference others in Start
+
+- [ ] **Coroutine Leaks**
+  - ✅ Check: Every StartCoroutine has corresponding StopCoroutine
+  - ❌ Bad: StartCoroutine without cleanup
+  - ✅ Good: Store coroutine reference and stop in OnDisable/OnDestroy
+
+- [ ] **Event Subscription Leaks**
+  - ✅ Check: Every += has corresponding -= in OnDestroy
+  - ❌ Bad: `eventSystem.OnAction += Handler;` without unsubscribe
+  - ✅ Good: Unsubscribe in OnDestroy or OnDisable
+
+- [ ] **Initialization/Disposal Order**
+  - ✅ Check: Disposal order is REVERSE of initialization order
+  - ❌ Bad: `Init A→B→C, Dispose A→B→C` (disposes foundation first)
+  - ✅ Good: `Init A→B→C, Dispose C→B→A` (disposes dependents first)
+  - 🎯 Rule: If C depends on B, and B depends on A, dispose C first
+
+- [ ] **ScriptableObject Shared State**
+  - ✅ Check: Runtime modifications don't affect asset
+  - ❌ Bad: Modifying ScriptableObject values directly at runtime
+  - ✅ Good: Create runtime instance copy for modifications
+
+- [ ] **GameObject.Find in Update**
+  - ✅ Check: No Find/FindObjectOfType in Update/FixedUpdate
+  - ❌ Bad: `GameObject.Find("Player")` in Update
+  - ✅ Good: Cache reference in Awake/Start
+
+- [ ] **Frequent GetComponent Calls**
+  - ✅ Check: Cache components instead of repeated GetComponent
+  - ❌ Bad: `GetComponent<Rigidbody>()` called every frame
+  - ✅ Good: Cache in Awake: `_rigidbody = GetComponent<Rigidbody>()`
+
+### Unity Editor Risks
+
+- [ ] **Scene Not Loaded in Editor Window**
+  - ✅ Check: Custom Editor Window checks if scene is loaded before accessing scene objects
+  - ❌ Bad: `GameObject.Find("Player")` in OnGUI without checking scene state
+  - ✅ Good: Check `SceneManager.GetActiveScene().isLoaded` before accessing scene objects
+  - 🎯 Risk: Editor Window auto-opens on Unity startup before scene loads
+
+- [ ] **Stale Scene References in Editor**
+  - ✅ Check: Clear cached scene object references on scene change
+  - ❌ Bad: Cached GameObject reference persists across scene reloads
+  - ✅ Good: Subscribe to EditorSceneManager.sceneOpened and clear references
+
+- [ ] **Missing EditorUtility.SetDirty**
+  - ✅ Check: Call SetDirty after modifying scene objects in Editor scripts
+  - ❌ Bad: Modify object without marking dirty (changes lost)
+  - ✅ Good: `EditorUtility.SetDirty(obj)` or `EditorSceneManager.MarkSceneDirty(scene)`
+
+### C# General Risks
+
+- [ ] **Collection Modification During Iteration**
+  - ✅ Check: Collections not modified while iterating
+  - ❌ Bad: `foreach (var item in list) { list.Remove(item); }`
+  - ✅ Good: Iterate over copy or use for loop backwards
+
+- [ ] **Async Exception Handling**
+  - ✅ Check: No async void methods (except event handlers)
+  - ❌ Bad: `async void ProcessData()` swallows exceptions
+  - ✅ Good: `async Task ProcessDataAsync()` with try-catch
+
+- [ ] **Closure Variable Capture**
+  - ✅ Check: Loop variables captured correctly in lambdas
+  - ❌ Bad: `for (int i=0; i<10; i++) { action += () => Use(i); }`
+  - ✅ Good: `for (int i=0; i<10; i++) { int copy=i; action += () => Use(copy); }`
+
+- [ ] **Boxing Performance**
+  - ✅ Check: Avoid frequent boxing of value types
+  - ❌ Bad: `object box = 42;` in hot path
+  - ✅ Good: Use generics or avoid boxing
+
+### Architecture Risks
+
+- [ ] **Circular Dependencies**
+  - ✅ Check: No bidirectional references between modules
+  - ❌ Bad: `ClassA` references `ClassB` and `ClassB` references `ClassA`
+  - ✅ Good: Use dependency injection or events for decoupling
+
+- [ ] **Single Responsibility Violation**
+  - ✅ Check: Class has one clear responsibility
+  - ❌ Bad: `PlayerController` handles input, physics, animation, UI
+  - ✅ Good: Split into `PlayerInput`, `PlayerMovement`, `PlayerAnimation`
+
+- [ ] **Magic Numbers and Strings**
+  - ✅ Check: Constants used instead of hardcoded values
+  - ❌ Bad: `if (type == "warrior")` or `speed = 5.5f`
+  - ✅ Good: `if (type == CharacterType.Warrior)` or `speed = WALK_SPEED`
+
+### Code Structure Risks
+
+- [ ] **Member Ordering Violation (MUST CHECK ON EVERY FILE MODIFICATION)**
+  - ✅ Check: When modifying ANY file, verify ENTIRE file follows member ordering rules
+  - 🎯 Trigger: Any code modification to a class file
+  - 📏 Reference: `my-base-rules.mdc` Member Ordering section
+  - ✅ Block Order (top to bottom):
+    1. Inner Classes
+    2. Delegates (delegate definitions and event members)
+    3. Fields ([SerializeField] first, then const, readonly, then public/protected/private)
+    4. Properties
+    5. Constructors
+    6. Normal Functions (public before private, caller before callee)
+    7. Unity Lifecycle Functions (Awake -> OnEnable -> Start -> Update -> OnDisable -> OnDestroy)
+  - ✅ Check: Each block wrapped with #region
+  - ❌ Bad: Unity lifecycle methods scattered among normal functions
+  - ❌ Bad: Private helper methods placed before public methods that call them
+  - ❌ Bad: Missing #region wrappers
+  - ✅ Action: If violations found, fix ordering BEFORE completing modification
+
+- [ ] **Redundant Comments**
+  - ✅ Check: Comments do not repeat what code already says
+  - ❌ Bad: `// Calculate point` above `CalculatePoint()` method
+  - ❌ Bad: `// Blue color` when color comes from config file
+  - ✅ Good: Extract logic to self-explanatory method names instead of comments
+  - 🎯 Rule: If comment explains WHAT, consider renaming/extracting method instead
+
+---
+
+## Known Bug Patterns (Historical)
+
+When specific bugs are discovered and fixed, add them here using this format:
+
+### Template Format
+
+```markdown
+### [PXXX] Short Title
+
+- **Symptom**: What users/tests observed
+- **Root Cause**: Technical reason for the bug
+- **Fix Strategy**: Correct solution approach
+- **Related Changelist**: CL#12345
+- **Affected Files**: `Path/To/File.cs`
+- **Date**: YYYY-MM-DD
+- **Prevention**: How to avoid in future
+```
+
+---
+
+## Database Search Strategy
+
+### When to Search the Postmortem Database
+
 - [ ] **MUST**: Search `.cursor/postmortem/` when modifying code in these areas:
 
 | Code Area | Search Location | Keywords |
 |-----------|----------------|----------|
-| Unity lifecycle (`Awake`, `Start`) | `categories/unity-lifecycle.md` | "lifecycle", "order" |
-| Unity Editor (`EditorWindow`) | `categories/unity-editor.md` | "scene loading", "SetDirty" |
-| Coroutines (`StartCoroutine`) | `categories/async-patterns.md` | "coroutine", "yield" |
-| Event subscriptions (`+=`) | `categories/memory-management.md` | "event", "leak" |
-| `GetComponent`, `Find` | `categories/memory-management.md` | "cache", "Find" |
-| Architecture changes | `categories/architecture.md` | "dependency", "circular" |
+| Unity lifecycle (`Awake`, `Start`, `OnEnable`, `OnDestroy`) | `categories/unity-lifecycle.md` | Method names, "lifecycle", "order" |
+| Unity Editor (`EditorWindow`, `CustomEditor`, Editor scripts) | `categories/unity-editor.md` | "EditorWindow", "scene loading", "SetDirty" |
+| Coroutines (`StartCoroutine`, `StopCoroutine`) | `categories/async-patterns.md` | "coroutine", "async", "yield" |
+| Event subscriptions (`+=`, `-=`) | `categories/memory-management.md` | "event", "subscribe", "leak" |
+| GetComponent, Find | `categories/memory-management.md` | "GetComponent", "Find", "cache" |
+| Class architecture changes | `categories/architecture.md` | "dependency", "circular", "responsibility" |
+| ScriptableObject modifications | `categories/architecture.md` | "ScriptableObject", "shared state" |
+| **Any class file modification** | `my-base-rules.mdc` | "Member Ordering", "#region" |
 
 ### How to Search
-- [ ] **MUST**: Use `grep` tool to search postmortem database.
-  ```
-  grep "Awake" -i path:.cursor/postmortem/categories/unity-lifecycle.md
-  ```
-- [ ] **MUST**: Review search results before completing code changes.
-- [ ] **MUST**: Report matches in the Self-Analysis Report (via `self-review` skill).
 
-## Adding New Patterns
+- [ ] **MUST**: Use `grep` or `rg` tool to search postmortem database
+  ```
+  Example 1: Modifying Awake() method
+  → grep "Awake" -i path:.cursor/postmortem/categories/unity-lifecycle.md
+  
+  Example 2: Adding coroutine
+  → grep "coroutine" -i path:.cursor/postmortem/categories/
+  
+  Example 3: Modifying class structure
+  → grep "circular\|dependency" -i path:.cursor/postmortem/categories/architecture.md
+  ```
+
+- [ ] **MUST**: Review search results before completing code changes
+  - ✅ If matches found: Read relevant sections
+  - ✅ If pattern applies: Mention in self-review report
+  - ✅ If unsure: Search broader with `path:.cursor/postmortem/`
+
+### Search Optimization
+
+- [ ] **SHOULD**: Search specific category first (faster)
+  - Unity lifecycle issues → `categories/unity-lifecycle.md`
+  - Unity Editor issues → `categories/unity-editor.md`
+  - Async issues → `categories/async-patterns.md`
+  - Memory issues → `categories/memory-management.md`
+  - Architecture issues → `categories/architecture.md`
+
+- [ ] **SHOULD**: Search entire database if no matches in specific category
+  - Use: `grep "[keyword]" -i path:.cursor/postmortem/`
+
+---
+
+## Historical Patterns Database
+
+**Location**: `.cursor/postmortem/categories/` and `.cursor/postmortem/changelists/`
+
+**Note**: Historical patterns are stored externally to keep this rule file concise.
+AI MUST search the database using `grep` tool when modifying relevant code areas.
+
+### 🔴 High Risk Patterns
+
+See: `.cursor/postmortem/categories/` (search using grep)
+
+### 🟡 Medium Risk Patterns
+
+See: `.cursor/postmortem/categories/` (search using grep)
+
+### 🟢 Low Risk Patterns
+
+See: `.cursor/postmortem/categories/` (search using grep)
+
+---
+
+## Usage Guidelines
+
+### For AI During Code Generation
+
+- [ ] **BEFORE modifying code**: Review checklist above
+- [ ] **BEFORE modifying code**: Search postmortem database for relevant keywords
+- [ ] **AFTER generating code**: Verify no patterns triggered
+- [ ] **DURING self-review**: Compare against known patterns
+- [ ] **IN review report**: Flag any pattern matches with database source
+
+### For Adding New Patterns
 
 When a new bug is discovered:
-1. **Document**: Add to `.cursor/postmortem/categories/`.
-2. **Analysis**: Add to `.cursor/postmortem/changelists/`.
-3. **Update Skill**: Add key prevention steps to `self-review/references/risk-checklist.md`.
+
+1. **Document in database**: Add to appropriate file in `.cursor/postmortem/categories/`
+2. **Create CL analysis**: Add detailed analysis in `.cursor/postmortem/changelists/CL-XXXXX.md`
+3. **Update category file**: Add pattern summary to relevant category
+4. **Update prevention checklist**: Add to Common Bug Prevention Checklist if widely applicable
+5. **Update statistics**: Reflect new pattern count in table below
+
+---
+
+## Statistics Summary
+
+| Category | Count | Last Updated |
+|----------|-------|--------------|
+| **Prevention Checklist Items** | **20** | 2026-01-26 |
+| **Database Categories** | **5** | 2026-01-26 |
+| Historical High Risk Patterns | See database | - |
+| Historical Medium Risk Patterns | See database | - |
+| Historical Low Risk Patterns | See database | - |
+
+**Note**: Historical patterns are stored in `.cursor/postmortem/` database.
+Use `grep` tool to search for specific patterns when modifying related code.
+
+---
+
+## AI Commitment
+
+**I, as the AI assistant, commit to**:
+- ✅ Checking ALL items in the prevention checklist before submitting code
+- ✅ **Searching `.cursor/postmortem/` database using `grep` tool** when modifying relevant code areas
+- ✅ Comparing code changes against known bug patterns (both checklist and database)
+- ✅ Flagging pattern matches in self-review report with database source
+- ✅ Suggesting new patterns when similar bugs are discovered
+- ❌ NEVER ignoring checklist items to save time
+- ❌ NEVER skipping database search for relevant code modifications
+
+**Search Example**:
+```
+When modifying Awake() method:
+1. Run: grep "Awake" -i path:.cursor/postmortem/categories/unity-lifecycle.md
+2. Review: Read any matches found
+3. Report: Flag in self-review if pattern applies
+```
+
+**This knowledge base grows with experience. Database contains historical patterns not listed here.**

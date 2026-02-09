@@ -36,6 +36,18 @@ Usage notes:
 <location>project</location>
 </skill>
 
+<skill>
+<name>sharelogger-usage</name>
+<description>Enforce using ShareLogger for logging in Unity code. Use when the user asks to print to console, add logs, or when code includes Debug.Log, print(), or Console.WriteLine. Replace those with ShareLogger.Instance.FuncInfo/Warn/Error.</description>
+<location>project</location>
+</skill>
+
+<skill>
+<name>deliberate-development</name>
+<description>Enforce a deliberate, phased approach to code development. AI must understand existing concepts first (Phase 1), then design abstractions/skeletons (Phase 2), then implement details (Phase 3). Use when adding features, refactoring, or extending architectural components.</description>
+<location>project</location>
+</skill>
+
 </available_skills>
 <!-- SKILLS_TABLE_END -->
 

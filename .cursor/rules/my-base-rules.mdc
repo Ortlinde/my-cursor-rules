@@ -6,8 +6,6 @@ alwaysApply: true
 
 # Base Coding Rules (ENFORCED)
 
-> **Note**: For detailed Unity Style Guides, Architecture Patterns, and Refactoring strategies, refer to the `coding-standards` skill.
-
 ## Environment Requirements
 
 - [ ] **MUST**: Use CRLF line endings for all files
@@ -33,12 +31,109 @@ alwaysApply: true
   - ✅ Pass: Single public class per `.cs` file
 
 - [ ] **MUST**: One concept per class
-  - ❌ Violation: `UserManagerValidator` (Mixed responsibilities)
-  - ✅ Pass: `UserValidator` (Single responsibility)
+  - ❌ Violation: `UserManagerValidator` (混合管理與驗證)
+  - ✅ Pass: `UserValidator` (單一職責：驗證)
 
 - [ ] **MUST**: One behavior per method
-  - ❌ Violation: `ProcessAndSaveData()`
-  - ✅ Pass: `ProcessData()` + `SaveData()`
+  - ❌ Violation: `ProcessAndSaveData()` (多個動作)
+  - ✅ Pass: `ProcessData()` + `SaveData()` (分離職責)
+
+### Member Ordering
+
+- [ ] **MUST**: Follow standardized member ordering within classes
+  - 📋 **Block Order** (top to bottom):
+    1. Inner Classes
+    2. Delegates (includes delegate definitions and event members)
+    3. Fields
+    4. Properties
+    5. Constructors
+    6. Normal Functions
+    7. Unity Lifecycle Functions
+  
+  - 🔒 **Access Modifier Order** (within each block):
+    1. [SerializeField] annotated members
+    2. (blank line)
+    3. const members
+    4. readonly members
+    5. (blank line)
+    6. public
+    7. protected
+    8. private
+  
+  - 📞 **Method Order** (within same access level):
+    - Methods ordered by call sequence (caller before callee)
+    - Helper methods placed after methods that call them
+  
+  - 🎯 **Unity Lifecycle Order** (within Unity Lifecycle Functions block):
+    - Follow official Unity execution order: https://docs.unity3d.com/6000.3/Documentation/Manual/execution-order.html
+    - Initialization: Awake -> OnEnable -> Start
+    - Physics: FixedUpdate -> Physics callbacks
+    - Game Logic: Update -> LateUpdate
+    - Rendering: OnPreCull -> OnPreRender -> OnPostRender -> OnRenderImage
+    - Deinitialization: OnDisable -> OnDestroy
+  
+  - 📦 **Region Wrapping**:
+    - ✅ Each major block MUST be wrapped with #region
+    - Example: `#region Fields`, `#region Unity Lifecycle`, etc.
+  
+  - ❌ **Violations**:
+    - Public field placed before [SerializeField]
+    - Constructor placed after normal functions
+    - OnDestroy placed before Awake
+    - Missing #region for major blocks
+  
+  - ✅ **Correct Example**:
+```csharp
+public class Example : MonoBehaviour
+{
+    #region Inner Classes
+    private class HelperClass { }
+    #endregion
+
+    #region Delegates
+    public delegate void OnValueChanged(int newValue);
+    public event System.Action OnStateChanged;
+    #endregion
+
+    #region Fields
+
+    [SerializeField] private int serializedValue;
+
+    private const int MAX_COUNT = 100;
+    private readonly int _readonlyValue;
+
+    public int publicField;
+    protected int protectedField;
+    private int privateField;
+
+    #endregion
+
+    #region Properties
+    public int PublicProperty { get; set; }
+    private int PrivateProperty { get; set; }
+    #endregion
+
+    #region Constructors
+    public Example() { }
+    #endregion
+
+    #region Normal Functions
+    public void Initialize() { }
+    private void InitializeInternal() { } // Called by Initialize
+    #endregion
+
+    #region Unity Lifecycle
+    private void Awake() { }
+    private void OnEnable() { }
+    private void Start() { }
+    private void FixedUpdate() { }
+    private void Update() { }
+    private void LateUpdate() { }
+    private void OnDisable() { }
+    private void OnDestroy() { }
+    #endregion
+}
+```
 
 ### Code Quality Standards
 
@@ -49,32 +144,63 @@ alwaysApply: true
 
 - [ ] **MUST**: Method parameters ≤ 3
   - 📏 Count: Constructor and method parameters
-  - ❌ Violation: `Initialize(a, b, c, d)`
-  - ✅ Pass: `Initialize(config)`
+  - ❌ Violation: `Initialize(a, b, c, d)` (4 parameters)
+  - ✅ Pass: `Initialize(config)` (1 parameter object)
 
 - [ ] **MUST**: Follow SOLID principles
-  - Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, Dependency Inversion.
-  - 💡 **See `coding-standards` skill for implementation patterns.**
+  - **S**ingle Responsibility: One reason to change
+  - **O**pen/Closed: Extend without modifying
+  - **L**iskov Substitution: Subtypes replaceable
+  - **I**nterface Segregation: Minimal interfaces
+  - **D**ependency Inversion: Depend on abstractions
 
 - [ ] **MUST**: Follow DRY (Don't Repeat Yourself)
-  - ❌ Violation: Identical logic copied across 3+ locations.
+  - ❌ Violation: Identical logic copied across 3+ locations
+  - ✅ Pass: Shared logic extracted to reusable method
+  - 💡 Tolerance: <3 lines duplicated <3 times (acceptable)
 
 ### Scope Control
 
 - [ ] **MUST**: When user explicitly specifies modification scope, do NOT modify outside that scope
   - 🎯 Trigger: User highlights/mentions specific method + says "only modify this method"
   - ❌ Violation: User marks `CalculateScore()`, AI also modifies `ValidateInput()`
-  - 💡 **Assumption**: User's scope declaration means they believe the task is completable within that scope.
+  - ❌ Violation: User marks method lines 45-60, AI modifies line 30
+  - ✅ Pass: User marks `CalculateScore()`, AI only changes within that method
+  - 💡 **If scope is insufficient**:
+    - ❌ DO NOT: Silently modify other areas
+    - ✅ DO: Stop and inform user: "This requires changes outside the method. Proceed?"
+    - ✅ DO: Explain what else needs to change and why
+  - 💡 **Assumption**: User's scope declaration means they believe the task is completable within that scope
 
 ---
 
-## SHOULD Guidelines (Triggers for `coding-standards` Skill)
+## SHOULD Requirements (Strong Recommendations)
 
-If the following thresholds are exceeded, invoke `coding-standards` skill for refactoring guidance:
+### Design Patterns
 
-- [ ] **SHOULD**: Extract methods when logic exceeds 20 lines.
-- [ ] **SHOULD**: Split large classes when > 150 lines or 5+ unrelated methods.
-- [ ] **SHOULD**: Avoid if/else/switch for complex type logic (Use Strategy/Factory patterns).
+- [ ] **SHOULD NOT**: Use if/else or switch for type comparison when logic is complex
+  - ❌ Poor Design: `if (type == "A") ... else if (type == "B") ... else if (type == "C")`
+  - ✅ Better: Strategy Pattern, Factory Pattern, Polymorphism
+  - 💡 **Acceptable if/else usage**:
+    - Simple boolean conditions (`if (isEnabled)`)
+    - 2-3 branches with trivial logic (<5 lines per branch)
+    - One-time validation checks
+    - Early returns for guard clauses
+  - 🎯 **Consider refactoring when**:
+    - 4+ branches in if/else chain
+    - Each branch >10 lines
+    - Same pattern repeated across multiple methods
+    - Type checking (instanceof, typeof comparisons)
+
+### Code Organization
+
+- [ ] **SHOULD**: Extract methods when logic exceeds 20 lines
+  - 💡 Guideline: Aim for methods ≤ 15 lines
+  - 💡 Acceptable: Up to 25 lines if highly cohesive
+
+- [ ] **SHOULD**: Split large classes into smaller components
+  - 💡 Guideline: Aim for ≤ 150 lines per class
+  - 💡 Trigger: When class has 5+ unrelated methods
 
 ---
 
@@ -86,8 +212,12 @@ If the following thresholds are exceeded, invoke `coding-standards` skill for re
 
 - [ ] **MUST NOT**: Introduce >3 new concepts per iteration (unless explicitly instructed)
   - 📏 Count: New classes, interfaces, patterns combined
-  - ❌ Violation: Adding 5 new classes unprompted
+  - ❌ Violation: Adding 5 new classes **without user requesting it**
   - ✅ Pass: Adding 2 new classes, then confirming before more
+  - 💡 **Exception**: User explicitly requests specific number
+    - ✅ Allowed: "Split this file into 5 classes" → Create all 5
+    - ✅ Allowed: "Refactor using Strategy pattern" → Create all required classes
+    - ❌ Prohibited: User asks to "improve code" → AI adds 5 classes unprompted
 
 - [ ] **MUST NOT**: Auto-generate ideas without approval
   - ❌ Prohibited: Unsolicited refactoring suggestions
@@ -118,7 +248,7 @@ If the following thresholds are exceeded, invoke `coding-standards` skill for re
    - Method >5 parameters
    - Violated SOLID principles
 
-2. **🟡 Warning Issues** (SHOULD address via `coding-standards`)
+2. **🟡 Warning Issues** (SHOULD address)
    - File 200-250 lines
    - Method 4 parameters
    - Method >25 lines

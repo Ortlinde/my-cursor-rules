@@ -81,10 +81,6 @@ alwaysApply: true
   - ✅ Reason: VS Code has auto-format; temporary errors resolve automatically
   - ❌ DO NOT: Repeatedly attempt to fix indentation issues
   - ❌ DO NOT: Block progress due to whitespace/tab errors
-  - 💡 **Only fix formatting if**:
-    - User explicitly requests formatting fix
-    - Error persists after user completes typing
-    - Formatting affects logic (e.g., Python indentation)
 
 - [ ] **MUST**: Re-check response after generation
   - 📏 Timing: Before submitting to user

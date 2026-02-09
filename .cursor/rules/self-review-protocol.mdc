@@ -1,63 +1,319 @@
 ---
-description: AI Self-Review Protocol - Mandatory trigger for code review via subagent
+description: AI Self-Review Protocol - Mandatory code review before submission
 globs: .cs
 alwaysApply: true
 ---
 
 # AI Self-Review Protocol (MANDATORY)
 
-> **Core Principle**: AI MUST delegate code review to the `code-reviewer` subagent after code generation.
+> **Core Principle**: AI MUST perform self-review after code generation and report results transparently.
 
-## Trigger Conditions
+## Coding Standards Location
 
-**MUST** delegate to `code-reviewer` subagent when ANY of the following occurs:
-- Modified or added >50 lines of code
-- Refactored existing functionality
-- Added new class, method, or interface
-- Modified architecture or dependencies
-- Touched Unity lifecycle or event system
-- Made unsolicited optimizations
+- [ ] **MUST**: All coding standards are defined in `my-base-rules.mdc`
+  - 📂 File: `.cursor/rules/my-base-rules.mdc`
+  - 📋 Contains: Clean Code, SOLID, DRY, File structure, Design patterns, Scope control
+  - 🎯 This file defines WHAT to check
+  - 🎯 Current file defines HOW to perform review
 
-## Execution Protocol
+- [ ] **MUST**: Enforcement rules are defined in `enforce-rules.mdc`
+  - 📂 File: `.cursor/rules/enforce-rules.mdc`
+  - 📋 Contains: AI behavior, Rule priorities, Conflict resolution
+  - 🎯 This file defines execution protocol
 
-1. **Delegate**: Use the Task tool to invoke `code-reviewer` subagent with `readonly: true`.
-2. **Wait**: Subagent performs Risk & Compliance Check.
-3. **Receive**: Subagent returns "Self-Analysis Report".
-4. **Act**: Follow subagent's recommendations (Proceed / Warning / STOP).
+---
 
-### Task Tool Parameters
+## Trigger Conditions (When Self-Review is MANDATORY)
 
-| Parameter | Value | Reason |
-|-----------|-------|--------|
-| `subagent_type` | `code-reviewer` | 使用專屬審查 agent |
-| `readonly` | `true` | 審查只需讀取，不需寫入 |
-| `model` | `fast` | 審查任務適合快速模型 |
+- [ ] **MUST**: Perform self-review when ANY of the following occurs
+  - 📏 Modified or added >50 lines of code
+  - 🔧 Refactored existing functionality
+  - 🆕 Added new class, method, or interface
+  - 🔄 Modified architecture or dependencies
+  - 🎯 Touched Unity lifecycle or event system
+  - 📝 Made unsolicited optimizations
 
-### Example Delegation
+---
 
+## Self-Review Execution Flow
+
+- [ ] **MUST**: Follow this exact sequence after code generation
+
+### Step 1: Rule Compliance Check
 ```
-Use the code-reviewer subagent (readonly) to review the changes made to [file(s)].
-Context: [Brief description of changes]
+✅ Action: Open and read my-base-rules.mdc
+✅ Action: Verify against coding standards:
+   - Environment Requirements (CRLF, no graphical chars)
+   - File & Class Structure (One File One Class, parameters ≤3)
+   - Code Quality (file ≤200 lines, method ≤20 lines)
+   - SOLID principles (all 5 principles)
+   - DRY principle (no duplication)
+   - Scope Control (respect user-specified scope)
+   - Design Patterns (avoid complex if/else)
+✅ Action: Verify ALL rules from enforce-rules.mdc
+📏 Timing: Before submitting response
+📂 Standards Source: .cursor/rules/my-base-rules.mdc
 ```
+
+### Step 2: Postmortem Pattern Check
+```
+✅ Action: Compare against postmortem-patterns.mdc
+✅ Action: Identify if any known bug patterns triggered
+📏 Timing: After rule compliance check
+```
+
+### Step 3: Generate Review Report
+```
+✅ Action: Create structured review report (see format below)
+✅ Action: Include report in response to user
+📏 Timing: Before submitting response
+❌ DO NOT: Skip report even if all checks pass
+```
+
+### Step 4: Decision Point
+```
+If violations ≥ 3: STOP and propose solutions
+If violations < 3: Proceed with warning
+If violations = 0: Proceed
+```
+
+---
+
+## Review Report Format (MANDATORY OUTPUT)
+
+- [ ] **MUST**: Include this report after EVERY code modification
+- [ ] **MUST**: Reference standards from `my-base-rules.mdc` in report
+
+````markdown
+## Self-Review Report
+
+### Modification Summary
+- **Scope**: [N] files, [M] lines
+- **Type**: [Added/Modified/Refactored/Deleted]
+- **Risk**: [🟢 Low / 🟡 Medium / 🔴 High]
+
+### Passed Checks
+- [List key checks that passed, reference my-base-rules.mdc standards]
+- Example: "Clean Code: Methods ≤20 lines, params ≤3 (my-base-rules.mdc)"
+- Example: "SOLID: Single responsibility maintained (my-base-rules.mdc)"
+
+### Warnings
+- [List potential risks for user attention]
+- [If none, write "None"]
+
+### Failed Checks
+- [List failed checks with explanation and rule reference]
+- Example: "❌ File length exceeds 200 lines (my-base-rules.mdc: Code Quality)"
+- [If none, write "None"]
+
+### Recommended Actions
+- [Additional testing needed?]
+- [Code review needed?]
+- [Performance testing needed?]
+````
+
+---
 
 ## Mandatory Stop Conditions
 
-**MUST** STOP code generation and discuss with user when subagent reports:
-- Failed checks >= 3
-- Triggered known bug pattern (Postmortem)
-- Modified >5 files without explicit authorization
-- Violated SOLID principles with no immediate fix
-- Introduced new external dependencies
+- [ ] **MUST**: STOP code generation and discuss with user when:
+  - ❌ Failed checks ≥ 3
+  - ❌ Triggered known bug pattern from postmortem
+  - ❌ Modified >5 files without explicit authorization
+  - ❌ Violated SOLID principles with no immediate fix
+  - ❌ Introduced new external dependencies
 
-## Enforcement
+---
 
-- **MUST**: Delegate review before finalizing response.
-- **MUST NOT**: Submit code without subagent review report if triggered.
-- **Verification**: User will check if "Self-Analysis Report" is present.
+## Failure Handling Protocol
 
-## Benefits of Subagent Delegation
+- [ ] **MUST**: When review fails, follow this protocol:
 
-- Main agent remains focused on implementation tasks
-- Code review runs in isolated context
-- Consistent, standardized review process
-- Clear separation of concerns
+### Step 1: Stop Immediately
+```
+❌ DO NOT: Continue generating code
+❌ DO NOT: Attempt automatic fixes
+✅ DO: Stop and report to user
+```
+
+### Step 2: Report Problem
+```
+✅ Action: Explain what failed
+✅ Action: Explain why it's a problem
+✅ Action: Explain impact
+```
+
+### Step 3: Propose Solutions
+```
+✅ Action: Provide exactly 3 options:
+  - Option A: Best practice (may take more time)
+  - Option B: Compromise (balance quality & speed)
+  - Option C: Quick fix (accept technical debt)
+✅ Action: Include time estimate for each
+```
+
+### Step 4: Wait for Decision
+```
+⏸️ Action: Wait for user to choose
+❌ DO NOT: Proceed without confirmation
+```
+
+---
+
+## Review Exemptions
+
+- [ ] **MAY**: Skip detailed review (but still provide brief summary) when:
+  - Modified <10 lines AND only comments/formatting
+  - Deleted unused code only
+  - Pure data class (POCO/DTO) with no logic
+  - User explicitly requests "quick prototype, skip review"
+
+---
+
+## Enforcement Mechanism
+
+- [ ] **MUST**: Self-check before submitting response
+  - ❓ Did I generate code >50 lines? → Review required
+  - ❓ Did I refactor anything? → Review required
+  - ❓ Did I add new class/method? → Review required
+  - ❓ Did I check against my-base-rules.mdc? → If not, CHECK IT NOW
+  - ❓ Did I include review report? → If not, ADD IT NOW
+
+- [ ] **MUST NOT**: Submit code without review report
+  - ❌ Violation: Submitting code without review when required
+  - ✅ Correct: Always include review report when triggered
+  
+- [ ] **MUST**: Reference my-base-rules.mdc in review report
+  - ❌ Violation: Generic checks without rule reference
+  - ✅ Correct: "File length exceeds 200 lines (my-base-rules.mdc: Code Quality)"
+
+---
+
+## Review Report Examples
+
+### Example 1: Pass (Low Risk)
+
+```markdown
+## Self-Review Report
+
+### Modification Summary
+- **Scope**: 1 file, 45 lines
+- **Type**: Added
+- **Risk**: 🟢 Low
+
+### Passed Checks
+- Clean Code: Methods ≤20 lines, params ≤3 (my-base-rules.mdc: Code Quality)
+- SOLID: Single responsibility maintained (my-base-rules.mdc: MUST Requirements)
+- Scope Control: No modifications outside intended scope (my-base-rules.mdc)
+- Environment: CRLF line endings, ASCII only (my-base-rules.mdc: Environment)
+
+### Warnings
+- None
+
+### Failed Checks
+- None
+
+### Recommended Actions
+- ✅ Ready to use
+- Consider adding unit tests for edge cases
+```
+
+### Example 2: Fail (High Risk - STOP)
+
+```markdown
+## Self-Review Report
+
+### Modification Summary
+- **Scope**: 3 files, 280 lines
+- **Type**: Refactored
+- **Risk**: 🔴 High
+
+### Passed Checks
+- Clean Code: Naming is clear (my-base-rules.mdc: Code Quality)
+- DRY: No code duplication (my-base-rules.mdc: MUST Requirements)
+
+### Warnings
+- Changes affect core system, needs full regression testing
+
+### Failed Checks
+- ❌ File length: 315 lines exceeds 200 line limit (my-base-rules.mdc: Code Quality Standards)
+- ❌ Missing event unsubscribe: OnSkillTriggered event (Unity best practice)
+- ❌ Triggered Postmortem P001: lifecycle order issue (postmortem-patterns.mdc)
+
+### Recommended Actions
+- 🛑 STOP - Need to discuss solutions
+
+---
+
+## Solution Options
+
+**Option A: Full Refactor (Recommended)**
+- Split ActorController into 3 classes
+- Properly implement event lifecycle
+- Estimated time: 30 minutes
+
+**Option B: Minimal Fix**
+- Fix event leak only
+- Accept class length technical debt
+- Estimated time: 5 minutes
+
+**Option C: Revert**
+- Rollback this refactor
+- Improve incrementally in smaller steps
+- Estimated time: 2 minutes
+
+Which option do you prefer?
+```
+
+---
+
+## AI Commitment
+
+**I, as the AI assistant, commit to**:
+- ✅ Performing self-review EVERY time trigger conditions are met
+- ✅ Including review report in EVERY response with code changes
+- ✅ STOPPING immediately when ≥3 checks fail
+- ✅ Transparently reporting ALL issues found
+- ✅ NEVER skipping review to save time
+- ❌ NEVER submitting code without required review
+
+**If I violate this commitment**:
+1. User should point out the missing review
+2. I will acknowledge the violation
+3. I will provide the missing review report
+4. I will learn to avoid similar violations
+
+---
+
+## Monitoring Checklist for User
+
+**Check if AI is following this protocol**:
+- [ ] Did AI provide review report after code changes?
+- [ ] Did report include all 5 sections (Summary, Passed, Warnings, Failed, Actions)?
+- [ ] Did AI reference my-base-rules.mdc in the report?
+- [ ] Did AI stop when failures ≥3?
+- [ ] Did AI propose 3 solutions when stopped?
+
+**If AI skipped review without exemption reason**:
+→ Point out: "You didn't provide self-review report"
+→ AI will immediately provide it
+
+**If AI didn't reference my-base-rules.mdc**:
+→ Point out: "You didn't check against my-base-rules.mdc"
+→ AI will re-check and provide updated report
+
+---
+
+## Summary
+
+**AI MUST remember**:
+
+> ✅ Self-review is MANDATORY, not optional
+> ✅ Review report MUST be included in response
+> ✅ ALL checks MUST reference my-base-rules.mdc
+> ✅ Stop IMMEDIATELY when checks fail
+> ✅ User satisfaction > output speed
+
+**Coding standards location**: `.cursor/rules/my-base-rules.mdc`
+
+**This is NOT optional. This is ENFORCED protocol.**
