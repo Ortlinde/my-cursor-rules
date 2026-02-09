@@ -46,6 +46,7 @@ setup.bat -Target "D:\Workspace\你的專案" -SkipOpenSkills
 | Agent | 說明 |
 |-------|------|
 | `code-reviewer` | Unity/C# 專屬程式碼審查，自動執行 Risk & Compliance Check |
+| `rules-maintainer` | 維護 rules/skills/agents 並自動同步至 GitHub repo |
 
 ### 🔧 自訂 Skills（`.claude/skills/`）
 
@@ -121,7 +122,7 @@ git config --global core.excludesfile %USERPROFILE%\.gitignore_global
 my-cursor-rules/
 ├── .cursor/
 │   ├── rules/           # 4 個自訂規則
-│   ├── agents/          # code-reviewer
+│   ├── agents/          # code-reviewer, rules-maintainer
 │   └── postmortem/      # Bug pattern 知識庫
 ├── .claude/
 │   └── skills/

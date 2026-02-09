@@ -301,8 +301,9 @@ Installed:
      - postmortem-patterns.mdc
      - self-review-protocol.mdc
   
-  Custom Agents (1)
+  Custom Agents (2)
      - code-reviewer (Unity/C# review)
+     - rules-maintainer (sync rules to GitHub)
   
   Custom Skills (2)
      - coding-standards (Unity coding standards)

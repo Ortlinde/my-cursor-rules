@@ -221,8 +221,9 @@ echo        - my-base-rules.mdc
 echo        - postmortem-patterns.mdc
 echo        - self-review-protocol.mdc
 echo.
-echo     Custom Agents ^(1^)
+echo     Custom Agents ^(2^)
 echo        - code-reviewer ^(Unity/C# review^)
+echo        - rules-maintainer ^(sync rules to GitHub^)
 echo.
 echo     Custom Skills ^(2^)
 echo        - coding-standards
