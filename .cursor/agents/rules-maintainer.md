@@ -17,6 +17,7 @@ readonly: false
 .cursor/
 ├── agents/           # SubAgent 定義
 │   ├── code-reviewer.md
+│   ├── complexity-triage.md
 │   └── rules-maintainer.md (this file)
 ├── postmortem/       # Bug patterns 知識庫
 │   └── categories/

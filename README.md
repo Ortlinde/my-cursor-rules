@@ -39,6 +39,7 @@ git clone https://github.com/Ortlinde/my-cursor-rules.git
 | Agent | 說明 |
 |-------|------|
 | `code-reviewer` | Unity/C# 專屬程式碼審查，自動執行 Risk & Compliance Check |
+| `complexity-triage` | 唯讀分析 agent，評估任務複雜度並回傳 TRIVIAL/HARD 判定，決定使用 Agent 或 Plan 模式 |
 | `rules-maintainer` | 維護 rules/skills/agents 並同步至 GitHub repo |
 
 ### 🔧 自訂 Skills (`.claude/skills/`)
