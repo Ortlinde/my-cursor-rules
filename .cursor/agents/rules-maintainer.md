@@ -95,8 +95,12 @@ AGENTS.md             # Skills 註冊檔（openskills 格式）
    ```powershell
    $projectDir = "d:\Workspace\DHF2_Unity\Model.Unity"
    
-   # 複製 .cursor/（排除 skills/ 因為已移至 .claude/skills/）
-   xcopy /E /Y "$projectDir\.cursor\*" "$syncDir\.cursor\"
+   # 複製 .cursor/（排除 project-specific/ 和 skills/）
+   xcopy /E /Y /EXCLUDE:$syncDir\exclude.txt "$projectDir\.cursor\*" "$syncDir\.cursor\"
+   # 手動排除 project-specific/（專案專有模式，不上傳 GitHub）
+   if (Test-Path "$syncDir\.cursor\postmortem\project-specific") {
+       Remove-Item -Recurse -Force "$syncDir\.cursor\postmortem\project-specific"
+   }
    
    # 複製自訂 skills（僅自訂的，不包含官方 openskills）
    $customSkills = @("coding-standards", "self-review", "sharelogger-usage", "deliberate-development")

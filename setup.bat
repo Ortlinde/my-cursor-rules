@@ -170,6 +170,18 @@ if exist "%TEMP_DIR%\.claude\skills\self-review" (
     echo   [OK] self-review
 )
 
+:: Copy sharelogger-usage
+if exist "%TEMP_DIR%\.claude\skills\sharelogger-usage" (
+    xcopy "%TEMP_DIR%\.claude\skills\sharelogger-usage" "%TARGET%\.claude\skills\sharelogger-usage" /E /I /Y /Q >nul
+    echo   [OK] sharelogger-usage
+)
+
+:: Copy deliberate-development
+if exist "%TEMP_DIR%\.claude\skills\deliberate-development" (
+    xcopy "%TEMP_DIR%\.claude\skills\deliberate-development" "%TARGET%\.claude\skills\deliberate-development" /E /I /Y /Q >nul
+    echo   [OK] deliberate-development
+)
+
 :: ============================================================
 :: Step 5: Re-sync AGENTS.md
 :: ============================================================
@@ -225,9 +237,11 @@ echo     Custom Agents ^(2^)
 echo        - code-reviewer ^(Unity/C# review^)
 echo        - rules-maintainer ^(sync rules to GitHub^)
 echo.
-echo     Custom Skills ^(2^)
+echo     Custom Skills ^(4^)
 echo        - coding-standards
 echo        - self-review
+echo        - sharelogger-usage
+echo        - deliberate-development
 echo.
 echo     Postmortem Knowledge Base
 echo        - Bug patterns and prevention

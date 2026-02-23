@@ -18,11 +18,14 @@
     ├── README.md                  # 本文件
     ├── changelists/               # Changelist 分析紀錄
     │   └── CL-XXXXX.md           # 個別 CL 分析
-    └── categories/                # 分類索引
-        ├── unity-lifecycle.md     # Unity 生命週期問題
-        ├── async-patterns.md      # 非同步模式問題
-        ├── memory-management.md   # 記憶體管理問題
-        └── architecture.md        # 架構設計問題
+    ├── categories/                # 分類索引 (通用，同步至 GitHub)
+    │   ├── unity-lifecycle.md     # Unity 生命週期問題
+    │   ├── unity-editor.md        # Unity Editor 問題
+    │   ├── async-patterns.md      # 非同步模式問題
+    │   ├── memory-management.md   # 記憶體管理問題
+    │   └── architecture.md        # 架構設計問題
+    └── project-specific/          # 專案專有模式 (不同步至 GitHub)
+        └── framesync-provider.md  # FrameSync DLL Provider 問題
 ```
 
 ## 🔄 工作流程
@@ -70,4 +73,7 @@ Diff:（如有）
 | 日期 | 動作 | 說明 |
 |------|------|------|
 | 2026-01-13 | 建立 | 初始化知識庫結構 |
+| 2026-02-10 | 新增分類 | framesync-provider.md - 專案專有的 FrameSync DLL Provider 問題 |
+| 2026-02-10 | 新增 P001 | [HIGH] Reentrant access to DLL Provider during FrameUpdate (framesync-provider.md) |
+| 2026-02-23 | 搬移 | framesync-provider.md 從 categories/ 搬移至 project-specific/ (不同步 GitHub) |
 

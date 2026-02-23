@@ -94,6 +94,17 @@ alwaysApply: true
 
 ---
 
+## AI Main Workflow (Code Tasks)
+
+- [ ] **MUST**: Follow this 5-phase process for every code task
+  - **Phase 1 - Understand**: Read related code, search `postmortem-patterns.mdc` knowledge base, confirm scope
+  - **Phase 2 - Plan**: Non-trivial tasks (3+ steps or architectural decisions) -> use Plan mode or TodoWrite; trivial tasks -> proceed directly
+  - **Phase 3 - Execute**: Follow `my-base-rules.mdc` constraints; if direction goes wrong -> STOP and re-plan (see Deviation Stop-and-Replan)
+  - **Phase 4 - Review**: Trigger conditions met -> launch `code-reviewer` subagent (see `self-review-protocol.mdc`)
+  - **Phase 5 - Learn**: If corrected by Admin -> propose recording to postmortem (see Correction-Triggered Learning); if major task completed -> propose system iteration
+
+---
+
 ## Rule Confirmation
 
 - [ ] **MUST**: Confirm rule acknowledgment in first response
@@ -129,6 +140,21 @@ alwaysApply: true
 
 ---
 
+## Deviation Stop-and-Replan
+
+- [ ] **MUST**: Stop and re-plan when direction deviates
+  - Trigger: ANY of the following
+    - 2 consecutive attempts did not achieve expected result
+    - Original assumption proven wrong
+    - Modification scope exceeds what was planned
+    - Encountered unforeseen dependency or conflict
+  - Action: Stop current operation immediately
+  - Action: Explain to Admin what deviated and why
+  - Action: Propose revised plan before continuing
+  - DO NOT: Keep pushing in a wrong direction hoping it will work
+
+---
+
 ## Ambiguous Rule Handling
 
 - [ ] **MUST**: When rule interpretation is unclear
@@ -151,6 +177,43 @@ alwaysApply: true
   - ✅ Action: Explain issue discovered
   - ✅ Action: Propose specific rule modification
   - ⏸️ Action: Wait for user approval before changing behavior
+
+---
+
+## Correction-Triggered Learning
+
+- [ ] **MUST**: When Admin corrects AI's mistake, propose recording the pattern
+  - Trigger: Admin points out an error in AI's code or approach
+  - Step 1: Fix the current response immediately
+  - Step 2: Assess if the error is "pattern-like" (could recur in future tasks)
+  - Step 3: If pattern-like, propose to Admin: "Should this pattern be recorded to postmortem?"
+  - Step 4: If Admin approves, append to the relevant `.cursor/postmortem/categories/` file
+  - DO NOT: Propose for every trivial typo or one-off mistake
+  - DO NOT: Modify any `.mdc` rule file or postmortem file without Admin's explicit approval
+
+- [ ] **SHOULD**: After completing a major task, propose system iteration
+  - Trigger: Solved a complex bug, completed architectural change, or discovered a new repeatable pattern
+  - Action: At the end of the response, append: "This task involved [X]. Suggest updating: [postmortem/rules/skill]. Proceed?"
+  - DO NOT: Propose after every small task
+
+---
+
+## Autonomous Action Boundaries
+
+- [ ] **MUST**: Decide autonomously or ask Admin based on context
+
+  Can act autonomously (no need to ask):
+  - Admin explicitly reported a bug and requested a fix
+  - Compilation error fixes
+  - Operations following established rules
+  - Local fixes within a single file
+
+  Must ask Admin:
+  - Architectural design decisions
+  - Multi-file refactoring
+  - Choices between multiple implementation approaches
+  - Operations involving deletion or new external dependencies
+  - Uncertain about Admin's intent
 
 ---
 

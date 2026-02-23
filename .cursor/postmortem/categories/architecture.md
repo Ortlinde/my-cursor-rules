@@ -4,9 +4,10 @@
 
 ## Known Patterns (Historical)
 
-<!-- Add discovered patterns here -->
+<!-- Add discovered general architecture patterns here -->
 
-**Note**: This section will grow as bugs are discovered and documented.
+**Note**: This section is for general architecture patterns only.
+For project-specific FrameSync/Provider issues, see `../project-specific/framesync-provider.md`.
 
 ---
 
@@ -232,4 +233,4 @@ When refactoring architecture, search this file for:
 
 ---
 
-**Last Updated**: 2026-01-26
+**Last Updated**: 2026-02-10

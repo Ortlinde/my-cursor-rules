@@ -236,7 +236,7 @@ if (Test-Path "$tempDir\.cursor") {
 Write-Host ""
 Write-Host "🔧 [4/4] 套用自訂 Skills..." -ForegroundColor Yellow
 
-$customSkills = @("coding-standards", "self-review")
+$customSkills = @("coding-standards", "self-review", "sharelogger-usage", "deliberate-development")
 
 foreach ($skill in $customSkills) {
     $skillPath = Join-Path $tempDir ".claude\skills\$skill"
@@ -307,12 +307,15 @@ Write-Host @"
      - postmortem-patterns.mdc
      - self-review-protocol.mdc
   
-  🤖 自訂 Agents (1 個)
+  🤖 自訂 Agents (2 個)
      - code-reviewer (Unity/C# 專屬審查)
+     - rules-maintainer (同步至 GitHub)
   
-  🔧 自訂 Skills (2 個)
+  🔧 自訂 Skills (4 個)
      - coding-standards (Unity 編碼規範)
      - self-review (自我審查流程)
+     - sharelogger-usage (ShareLogger 強制使用)
+     - deliberate-development (三階段開發協議)
   
   📚 Postmortem 知識庫
      - Bug patterns 分類與預防

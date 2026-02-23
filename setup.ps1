@@ -230,7 +230,7 @@ if (Test-Path "$tempDir\.cursor") {
 Write-Host ""
 Write-Host "[4/4] Applying custom Skills..." -ForegroundColor Yellow
 
-$customSkills = @("coding-standards", "self-review")
+$customSkills = @("coding-standards", "self-review", "sharelogger-usage", "deliberate-development")
 
 foreach ($skill in $customSkills) {
     $skillPath = Join-Path $tempDir ".claude\skills\$skill"
@@ -305,9 +305,11 @@ Installed:
      - code-reviewer (Unity/C# review)
      - rules-maintainer (sync rules to GitHub)
   
-  Custom Skills (2)
+  Custom Skills (4)
      - coding-standards (Unity coding standards)
      - self-review (Self-review workflow)
+     - sharelogger-usage (ShareLogger enforcement)
+     - deliberate-development (3-phase development)
   
   Postmortem Knowledge Base
      - Bug patterns and prevention

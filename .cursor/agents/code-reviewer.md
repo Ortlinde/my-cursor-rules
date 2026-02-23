@@ -74,6 +74,13 @@ git diff HEAD~1
 - [ ] **Circular Deps**: 無雙向模組參考
 - [ ] **Magic Values**: 使用常數/enum，非硬編碼字串/數字
 
+### Step 2.5: Holistic Quality Gate
+
+After completing the checklist, perform one additional holistic judgment:
+- Ask yourself: "Would a staff engineer approve this code?"
+- If the answer is not a clear "yes", add a Warning to the report explaining the concern
+- This step catches implicit issues that checklists cannot cover (e.g., overengineering, unclear intent, fragile design)
+
 ### Step 3: 產出報告
 
 根據檢查結果，選擇適當的模板：

@@ -12,7 +12,7 @@ alwaysApply: true
 - [ ] **MUST**: Historical bug patterns are stored in `.cursor/postmortem/`
   - 📂 Database Path: `.cursor/postmortem/`
   - 📋 Structure:
-    - `categories/` - Bug patterns by category (Unity Lifecycle, Unity Editor, Async, Memory, Architecture)
+    - `categories/` - Bug patterns by category (Unity Lifecycle, Unity Editor, Async, Memory, Architecture, FrameSync Provider)
     - `changelists/` - Detailed analysis by CL number
     - `README.md` - Database overview and workflow
   - 🎯 This database grows with project experience
@@ -206,116 +206,47 @@ When specific bugs are discovered and fixed, add them here using this format:
 | GetComponent, Find | `categories/memory-management.md` | "GetComponent", "Find", "cache" |
 | Class architecture changes | `categories/architecture.md` | "dependency", "circular", "responsibility" |
 | ScriptableObject modifications | `categories/architecture.md` | "ScriptableObject", "shared state" |
+| **PerformManager cross-system queries** (`FindPlayer`, `FindBullet`, `FindFort`, `FindTarget`) | `project-specific/framesync-provider.md` | "Provider", "reentrant", "FindPlayer", "P001" |
+| **BaseBullet/BasePlayer/BaseFort Initial() methods** | `project-specific/framesync-provider.md` | "Initial", "OnSpawn", "Provider", "P001" |
 | **Any class file modification** | `my-base-rules.mdc` | "Member Ordering", "#region" |
 
-### How to Search
-
-- [ ] **MUST**: Use `grep` or `rg` tool to search postmortem database
-  ```
-  Example 1: Modifying Awake() method
-  → grep "Awake" -i path:.cursor/postmortem/categories/unity-lifecycle.md
-  
-  Example 2: Adding coroutine
-  → grep "coroutine" -i path:.cursor/postmortem/categories/
-  
-  Example 3: Modifying class structure
-  → grep "circular\|dependency" -i path:.cursor/postmortem/categories/architecture.md
-  ```
-
-- [ ] **MUST**: Review search results before completing code changes
-  - ✅ If matches found: Read relevant sections
-  - ✅ If pattern applies: Mention in self-review report
-  - ✅ If unsure: Search broader with `path:.cursor/postmortem/`
-
-### Search Optimization
-
-- [ ] **SHOULD**: Search specific category first (faster)
-  - Unity lifecycle issues → `categories/unity-lifecycle.md`
-  - Unity Editor issues → `categories/unity-editor.md`
-  - Async issues → `categories/async-patterns.md`
-  - Memory issues → `categories/memory-management.md`
-  - Architecture issues → `categories/architecture.md`
-
-- [ ] **SHOULD**: Search entire database if no matches in specific category
-  - Use: `grep "[keyword]" -i path:.cursor/postmortem/`
+- [ ] **MUST**: Search postmortem database using `grep` or `rg` before completing code changes
+  - Search the specific category file listed in the table above
+  - If no matches, broaden search to `.cursor/postmortem/`
+  - If pattern matches found, flag in self-review report
 
 ---
 
-## Historical Patterns Database
+## General vs Project-Specific Patterns
 
-**Location**: `.cursor/postmortem/categories/` and `.cursor/postmortem/changelists/`
+- **General patterns** (C#, Unity, Architecture): Listed in the checklist above, always-applied
+- **Project-specific patterns** (e.g., FrameSync DLL P001): Stored in `.cursor/postmortem/categories/` only, NOT in this checklist
+- Project-specific patterns are discovered via the **Database Search Strategy table** above during code-reviewer subagent execution
+- Project-specific pattern files are NOT synced to GitHub
 
-**Note**: Historical patterns are stored externally to keep this rule file concise.
-AI MUST search the database using `grep` tool when modifying relevant code areas.
-
-### 🔴 High Risk Patterns
-
-See: `.cursor/postmortem/categories/` (search using grep)
-
-### 🟡 Medium Risk Patterns
-
-See: `.cursor/postmortem/categories/` (search using grep)
-
-### 🟢 Low Risk Patterns
-
-See: `.cursor/postmortem/categories/` (search using grep)
-
----
-
-## Usage Guidelines
-
-### For AI During Code Generation
-
-- [ ] **BEFORE modifying code**: Review checklist above
-- [ ] **BEFORE modifying code**: Search postmortem database for relevant keywords
-- [ ] **AFTER generating code**: Verify no patterns triggered
-- [ ] **DURING self-review**: Compare against known patterns
-- [ ] **IN review report**: Flag any pattern matches with database source
-
-### For Adding New Patterns
+## Adding New Patterns
 
 When a new bug is discovered:
 
-1. **Document in database**: Add to appropriate file in `.cursor/postmortem/categories/`
-2. **Create CL analysis**: Add detailed analysis in `.cursor/postmortem/changelists/CL-XXXXX.md`
-3. **Update category file**: Add pattern summary to relevant category
-4. **Update prevention checklist**: Add to Common Bug Prevention Checklist if widely applicable
-5. **Update statistics**: Reflect new pattern count in table below
+1. **Assign P-number**: Use next available number (see P-Number Registry below)
+2. **Document in database**: Add to appropriate file in `.cursor/postmortem/categories/`
+3. **Create CL analysis**: Add detailed analysis in `.cursor/postmortem/changelists/CL-XXXXX.md`
+4. **General pattern?** Add to Common Bug Prevention Checklist above
+5. **Project-specific?** Add search entry to Database Search Strategy table only (not to checklist)
+6. **Update statistics**
+
+### P-Number Registry
+
+| P-Number | Title | Category | Scope |
+|----------|-------|----------|-------|
+| P001 | DLL Provider Reentrance | project-specific/framesync-provider.md | Project-specific |
 
 ---
 
-## Statistics Summary
+## Statistics
 
 | Category | Count | Last Updated |
 |----------|-------|--------------|
-| **Prevention Checklist Items** | **20** | 2026-01-26 |
-| **Database Categories** | **5** | 2026-01-26 |
-| Historical High Risk Patterns | See database | - |
-| Historical Medium Risk Patterns | See database | - |
-| Historical Low Risk Patterns | See database | - |
-
-**Note**: Historical patterns are stored in `.cursor/postmortem/` database.
-Use `grep` tool to search for specific patterns when modifying related code.
-
----
-
-## AI Commitment
-
-**I, as the AI assistant, commit to**:
-- ✅ Checking ALL items in the prevention checklist before submitting code
-- ✅ **Searching `.cursor/postmortem/` database using `grep` tool** when modifying relevant code areas
-- ✅ Comparing code changes against known bug patterns (both checklist and database)
-- ✅ Flagging pattern matches in self-review report with database source
-- ✅ Suggesting new patterns when similar bugs are discovered
-- ❌ NEVER ignoring checklist items to save time
-- ❌ NEVER skipping database search for relevant code modifications
-
-**Search Example**:
-```
-When modifying Awake() method:
-1. Run: grep "Awake" -i path:.cursor/postmortem/categories/unity-lifecycle.md
-2. Review: Read any matches found
-3. Report: Flag in self-review if pattern applies
-```
-
-**This knowledge base grows with experience. Database contains historical patterns not listed here.**
+| General Checklist Items | 20 | 2026-02-23 |
+| Project-Specific Patterns | 1 (P001) | 2026-02-10 |
+| Database Categories | 6 | 2026-02-10 |
