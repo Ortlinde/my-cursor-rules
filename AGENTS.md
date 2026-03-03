@@ -22,19 +22,7 @@ Usage notes:
 
 <available_skills>
 
-<!-- 以下為自訂 Skills，官方 OpenSkills 會在 openskills sync 時自動加入 -->
-
-<skill>
-<name>coding-standards</name>
-<description>Detailed coding standards, style guides, and architectural patterns for Unity development. Use this skill when the user asks about code style, refactoring, best practices, or when you need to verify if code meets detailed quality standards (beyond the basic MUST rules).</description>
-<location>project</location>
-</skill>
-
-<skill>
-<name>self-review</name>
-<description>Standardized code review process including Self-Analysis Report and Risk Checklist. Use when finishing code modifications >50 lines, refactoring, or when instructed by rules.</description>
-<location>project</location>
-</skill>
+<!-- PROJECT-SPECIFIC skills (this project only, not copied globally) -->
 
 <skill>
 <name>sharelogger-usage</name>
@@ -42,11 +30,27 @@ Usage notes:
 <location>project</location>
 </skill>
 
+<!-- GLOBAL skills (copied to ~/.claude/skills/, available in all projects) -->
+
+<skill>
+<name>coding-standards</name>
+<description>Detailed coding standards, style guides, and architectural patterns for Unity development. Use this skill when the user asks about code style, refactoring, best practices, or when you need to verify if code meets detailed quality standards (beyond the basic MUST rules).</description>
+<location>global</location>
+</skill>
+
+<skill>
+<name>self-review</name>
+<description>Standardized code review process including Self-Analysis Report and Risk Checklist. Use when finishing code modifications >50 lines, refactoring, or when instructed by rules.</description>
+<location>global</location>
+</skill>
+
 <skill>
 <name>deliberate-development</name>
 <description>Enforce a deliberate, phased approach to code development. AI must understand existing concepts first (Phase 1), then design abstractions/skeletons (Phase 2), then implement details (Phase 3). Use when adding features, refactoring, or extending architectural components.</description>
-<location>project</location>
+<location>global</location>
 </skill>
+
+<!-- Official OpenSkills (global, synced via openskills sync) -->
 
 </available_skills>
 <!-- SKILLS_TABLE_END -->
