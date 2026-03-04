@@ -39,8 +39,15 @@ git clone https://github.com/Ortlinde/my-cursor-rules.git
 | Agent | 說明 |
 |-------|------|
 | `code-reviewer` | Unity/C# 專屬程式碼審查，自動執行 Risk & Compliance Check |
-| `complexity-triage` | 唯讀分析 agent，評估任務複雜度並回傳 TRIVIAL/HARD 判定，決定使用 Agent 或 Plan 模式 |
+| `complexity-triage` | 任務複雜度評估，回傳 TRIVIAL/HARD verdict 決定執行模式 |
 | `rules-maintainer` | 維護 rules/skills/agents 並同步至 GitHub repo |
+
+### ⌨️ Slash Commands (`.claude/commands/`)
+
+| Command | 說明 |
+|---------|------|
+| `/pullRules` | 從 GitHub repo 同步規則到本地（repo → local） |
+| `/pushRules` | 推送本地規則到 GitHub repo（local → repo） |
 
 ### 🔧 自訂 Skills (`.claude/skills/`)
 
@@ -68,9 +75,16 @@ git clone https://github.com/Ortlinde/my-cursor-rules.git
 irm https://raw.githubusercontent.com/Ortlinde/my-cursor-rules/main/setup.ps1 | iex
 ```
 
-## 同步至 GitHub
+## 同步規則
 
-使用 `rules-maintainer` subagent 同步本地修改至 GitHub：
+使用 Slash Commands 快速同步（不詢問確認）：
+
+```
+/pullRules    # repo → local（從 GitHub 拉取最新規則）
+/pushRules    # local → repo（推送本地修改到 GitHub）
+```
+
+或使用 `rules-maintainer` subagent 進行進階維護：
 
 ```
 請同步 rules/skills/agents 到 GitHub repo
