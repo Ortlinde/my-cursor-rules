@@ -30,6 +30,9 @@ readonly: false
 └── setup.ps1         # 安裝腳本
 
 .claude/
+├── commands/         # Slash commands（規則維護指令）
+│   ├── pullRules.md
+│   └── pushRules.md
 └── skills/           # Skills 定義
     ├── coding-standards/
     ├── self-review/
@@ -77,16 +80,21 @@ AGENTS.md             # Skills 註冊檔（openskills 格式）
 
 當用戶要求同步時，執行以下步驟：
 
-1. **切換到同步目錄並拉取最新版本**
+1. **確認同步目錄（$syncDir）**
+
+   依序查找，取第一個有效值：
+
+   a. 讀取 `~/.claude/MEMORY.md`，尋找格式為 `syncDir: <path>` 的條目
+   b. 若無記錄，**詢問用戶**：「請問 my-cursor-rules 的本地同步目錄在哪裡？」
+   c. 用戶提供路徑後，檢查該路徑是否含有 `.git/`：
+      - **是**：使用此路徑，並將 `syncDir: <path>` 寫入 `~/.claude/MEMORY.md` 供日後使用
+      - **否**：詢問用戶「此位置 (`<path>`) 沒有找到 repo，是否要在這裡 clone？(y/n)」
+        - 同意：執行 `git clone https://github.com/Ortlinde/my-cursor-rules.git <path>`，然後繼續
+        - 拒絕：停止，等待用戶重新指定路徑
+
    ```powershell
-   # 固定同步目錄（不要每次建立暫存目錄）
-   $syncDir = "d:\Workspace\my-cursor-rules"
-   
-   # 如果目錄不存在，先 clone
-   if (-not (Test-Path $syncDir)) {
-       git clone https://github.com/Ortlinde/my-cursor-rules.git $syncDir
-   }
-   
+   # $syncDir 由上述查找步驟取得（不可硬編碼）
+
    # 切換到目錄並拉取最新版本
    Set-Location $syncDir
    git pull origin main
@@ -94,7 +102,7 @@ AGENTS.md             # Skills 註冊檔（openskills 格式）
 
 2. **複製要同步的檔案**（從專案目錄複製到同步目錄）
    ```powershell
-   $projectDir = "d:\Workspace\DHF2_Unity\Model.Unity"
+   $projectDir = (Get-Location).Path   # 目前工作區（執行時的 CWD）
    
    # 複製 .cursor/（排除 project-specific/ 和 skills/）
    xcopy /E /Y /EXCLUDE:$syncDir\exclude.txt "$projectDir\.cursor\*" "$syncDir\.cursor\"
@@ -111,7 +119,10 @@ AGENTS.md             # Skills 註冊檔（openskills 格式）
    
    # 複製 AGENTS.md
    Copy-Item -Path "$projectDir\AGENTS.md" -Destination "$syncDir\AGENTS.md" -Force
-   
+
+   # 複製 commands（slash commands，與 rules 同一套組）
+   xcopy /E /Y "$projectDir\.claude\commands\*" "$syncDir\.claude\commands\"
+
    # 複製 README.md 到 repo 根目錄
    Copy-Item -Path "$projectDir\.cursor\README.md" -Destination "$syncDir\README.md" -Force
    ```
@@ -188,7 +199,7 @@ readonly: true
 ## GitHub Repo 資訊
 
 - **Repo URL**: https://github.com/Ortlinde/my-cursor-rules
-- **本地同步目錄**: `d:\Workspace\my-cursor-rules`（固定，不要每次建立暫存）
+- **本地同步目錄**: 從 `~/.claude/MEMORY.md` 讀取 `syncDir` 條目；若無記錄則詢問用戶
 - **Branch**: main
 - **同步方向**: Local → GitHub（本地優先）
 
@@ -203,7 +214,7 @@ readonly: true
 ## 注意事項
 
 1. **先 Pull 再 Push**：同步前**必須**先 `git pull` 確保本地 repo 是最新版本
-2. **固定目錄**：使用 `d:\Workspace\my-cursor-rules` 作為同步目錄，不要每次建立暫存目錄
+2. **同步目錄來源**：從 `~/.claude/MEMORY.md` 的 `syncDir` 讀取；首次使用時詢問用戶並記錄
 3. **本地優先**：專案中的修改優先於 repo，同步時會覆蓋 repo 內容
 4. **僅同步自訂 Skills**：不要將官方 openskills 同步到 repo
 5. **Commit Message 格式**：

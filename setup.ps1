@@ -249,6 +249,19 @@ foreach ($skill in $customSkills) {
 }
 
 # ============================================================
+# Copy Slash Commands
+# ============================================================
+$commandsPath = Join-Path $tempDir ".claude\commands"
+if (Test-Path $commandsPath) {
+    $destCommandsDir = Join-Path $Target ".claude\commands"
+    if (-not (Test-Path $destCommandsDir)) {
+        New-Item -ItemType Directory -Path $destCommandsDir -Force | Out-Null
+    }
+    Copy-Item -Path "$commandsPath\*" -Destination $destCommandsDir -Recurse -Force
+    Write-Host "  [OK] pullRules, pushRules (slash commands)" -ForegroundColor Green
+}
+
+# ============================================================
 # Step 5: Re-sync AGENTS.md (if npm available)
 # ============================================================
 if (-not $SkipOpenSkills) {
@@ -301,10 +314,15 @@ Installed:
      - postmortem-patterns.mdc
      - self-review-protocol.mdc
   
-  Custom Agents (2)
+  Custom Agents (3)
      - code-reviewer (Unity/C# review)
+     - complexity-triage (task complexity triage)
      - rules-maintainer (sync rules to GitHub)
-  
+
+  Slash Commands (2)
+     - /pullRules (repo -> local)
+     - /pushRules (local -> repo)
+
   Custom Skills (4)
      - coding-standards (Unity coding standards)
      - self-review (Self-review workflow)

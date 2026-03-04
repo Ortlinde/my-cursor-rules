@@ -182,6 +182,15 @@ if exist "%TEMP_DIR%\.claude\skills\deliberate-development" (
     echo   [OK] deliberate-development
 )
 
+:: Copy slash commands
+if exist "%TEMP_DIR%\.claude\commands" (
+    if not exist "%TARGET%\.claude\commands" (
+        mkdir "%TARGET%\.claude\commands" >nul 2>&1
+    )
+    xcopy "%TEMP_DIR%\.claude\commands" "%TARGET%\.claude\commands" /E /I /Y /Q >nul
+    echo   [OK] pullRules, pushRules ^(slash commands^)
+)
+
 :: ============================================================
 :: Step 5: Re-sync AGENTS.md
 :: ============================================================
@@ -233,9 +242,14 @@ echo        - my-base-rules.mdc
 echo        - postmortem-patterns.mdc
 echo        - self-review-protocol.mdc
 echo.
-echo     Custom Agents ^(2^)
+echo     Custom Agents ^(3^)
 echo        - code-reviewer ^(Unity/C# review^)
+echo        - complexity-triage ^(task complexity verdict^)
 echo        - rules-maintainer ^(sync rules to GitHub^)
+echo.
+echo     Slash Commands ^(2^)
+echo        - /pullRules ^(repo to local^)
+echo        - /pushRules ^(local to repo^)
 echo.
 echo     Custom Skills ^(4^)
 echo        - coding-standards
