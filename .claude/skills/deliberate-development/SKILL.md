@@ -1,6 +1,6 @@
 ---
 name: deliberate-development
-description: Enforce a deliberate, phased approach to code development. AI must understand existing concepts first, then design abstractions, then implement details. Prevents premature implementation and ensures architectural alignment.
+description: "Enforce a deliberate, phased approach to code development. Use when starting a new feature, system, or module design from scratch, or when Admin requests architectural planning before implementation. Do NOT use for simple bug fixes, single-file changes, or tasks with already-defined scope."
 ---
 
 # Deliberate Development (Walk Slow, Think Deep)

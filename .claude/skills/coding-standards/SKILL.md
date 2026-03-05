@@ -1,6 +1,6 @@
 ---
 name: coding-standards
-description: Detailed coding standards, style guides, and architectural patterns for Unity development. Use this skill when the user asks about code style, refactoring, best practices, or when you need to verify if code meets detailed quality standards (beyond the basic MUST rules).
+description: "Detailed coding standards, style guides, and architectural patterns for Unity development. ALWAYS invoke this skill before writing, editing, or reviewing any code -- no exceptions. Also use when the user asks about code style, refactoring, best practices, or when verifying code quality."
 ---
 
 # Coding Standards
