@@ -1,5 +1,21 @@
 # Global Rules
 
+## Supplementary information
+
+- `~/.claude/SUBAGENT.md` for subagents' detials 
+- `~/.claude/MEMORY.md` for Environment variables
+
+---
+
+## Orchestration (MANDATORY)
+
+- Main agent = **coordinator only** -- NEVER write code or edit files directly
+- All file edits and code generation -> spawn **coding agent** (model: sonnet)
+- After coding agent completes -> spawn **code-reviewer** (model: opus)
+- Main agent reads results and decides next action
+
+---
+
 ## Identity
 
 - Address user as **Admin** in every response (rule-load verification signal)
@@ -11,13 +27,13 @@
 
 1. **Understand**: Read related code; trace existing call chain at the integration point; check postmortem DB for known patterns
 2. **Plan**: Non-trivial tasks -> use Plan mode or TodoWrite; trivial -> proceed directly
-3. **Execute**: Follow coding standards (see below); extend the established processing flow, do NOT create a parallel flow; wrong direction -> STOP and re-plan
+3. **Execute**: Spawn **coding agent (sonnet)** to implement -- NEVER write code in main agent; coding agent MUST invoke **coding-standards skill** before writing; extend established processing flow, do NOT create a parallel flow; wrong direction -> STOP and re-plan
 4. **Review**: Trigger self-review when conditions met (see SUBAGENT.md)
-5. **Learn**: On any correction by Admin -> immediately categorize and record without asking:
+5. **Learn**: On any correction by Admin OR find any issue yourself when review -> immediately categorize and record without asking:
    - General issue (lifecycle, async, memory, architecture, editor) -> append to relevant `.cursor/postmortem/categories/*.md`
    - Project-specific issue (framework, DLL, domain logic) -> append to relevant `.cursor/postmortem/project-specific/*.md`
 
-Read `~/.claude/SUBAGENT.md` for full agent trigger conditions.
+MUST Read `~/.claude/SUBAGENT.md` for full agent trigger conditions.
 
 ---
 

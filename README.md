@@ -109,7 +109,7 @@ git config --global core.excludesfile ~/.gitignore_global
 
 ## 官方 OpenSkills
 
-此 repo 的 `setup.ps1` 會自動安裝 [Anthropic 官方 OpenSkills](https://github.com/anthropics/openskills)（17 個），包括：
+此 repo 的 `setup.ps1` 會自動安裝 [Anthropic 官方 OpenSkills](https://github.com/numman-ali/openskills)（17 個），包括：
 
 - `docx` - Word 文件處理
 - `pptx` - PowerPoint 處理

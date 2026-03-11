@@ -4,8 +4,8 @@
 
 | Role | Model | Reason |
 |------|-------|--------|
-| Orchestrator / Reviewer | **opus** | High reasoning -- planning, triage, review |
-| Writer / Implementer | **sonnet** | Cost-efficient -- code generation, edits |
+| Orchestrator / Reviewer | **opus** | High reasoning — planning, triage, review |
+| Writer / Implementer | **sonnet** | Cost-efficient — code generation, edits |
 
 ---
 
