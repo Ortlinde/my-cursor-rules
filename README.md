@@ -48,6 +48,7 @@ git clone https://github.com/Ortlinde/my-cursor-rules.git
 |---------|------|
 | `/pullRules` | 從 GitHub repo 同步規則到本地（repo → local） |
 | `/pushRules` | 推送本地規則到 GitHub repo（local → repo） |
+| `/syncSkills` | 掃描已安裝的 skills，AI 自動生成描述並重建 AGENTS.md |
 
 ### 🔧 自訂 Skills (`.claude/skills/`)
 

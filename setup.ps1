@@ -258,7 +258,7 @@ if (Test-Path $commandsPath) {
         New-Item -ItemType Directory -Path $destCommandsDir -Force | Out-Null
     }
     Copy-Item -Path "$commandsPath\*" -Destination $destCommandsDir -Recurse -Force
-    Write-Host "  [OK] pullRules, pushRules (slash commands)" -ForegroundColor Green
+    Write-Host "  [OK] pullRules, pushRules, syncSkills (slash commands)" -ForegroundColor Green
 }
 
 # ============================================================
@@ -319,9 +319,10 @@ Installed:
      - complexity-triage (task complexity triage)
      - rules-maintainer (sync rules to GitHub)
 
-  Slash Commands (2)
+  Slash Commands (3)
      - /pullRules (repo -> local)
      - /pushRules (local -> repo)
+     - /syncSkills (rebuild AGENTS.md from installed skills)
 
   Custom Skills (4)
      - coding-standards (Unity coding standards)
