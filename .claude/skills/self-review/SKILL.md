@@ -13,6 +13,20 @@ This skill guides you through the mandatory self-review process. You must execut
 2.  **Generate Report**: Create the "Self-Analysis Report" using the standard template.
 3.  **Decision**: Proceed, Warn, or Stop based on findings.
 
+## Reviewer Mindset
+
+**Core question: "Would a senior software architect consider this code *good enough*?"**
+
+"Good" is defined concretely as meeting ALL of the following criteria:
+
+- **Correct**: Behaves as specified; no obvious bugs or edge-case failures
+- **Readable**: Another engineer can understand the intent without explanation
+- **Maintainable**: Future changes are easier, not harder, because of this code
+- **Consistent**: Matches the architecture and patterns established in the existing codebase and Phase docs
+- **Simple**: Favors the simplest solution that satisfies the requirements -- no cleverness for its own sake
+
+If any criterion is not met, that is a finding to report -- even if no checklist rule is technically violated.
+
 ## Step 1: Risk & Compliance Check
 
 Load and verify the checklist. This combines "Risk Avoidance" (Postmortem patterns) and "Coding Style" (Base rules).
