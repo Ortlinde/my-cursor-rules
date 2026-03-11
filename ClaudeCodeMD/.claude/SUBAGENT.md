@@ -32,6 +32,9 @@ Agent file: `.cursor/agents/complexity-triage.md`
 
 **Model: opus**
 
+**Reviewer Mindset:** Ask yourself -- "Would a senior software architect consider this code *good enough*?"
+Not just "does it follow rules", but whether the design, clarity, and structure meet the standard of a seasoned professional.
+
 Launch AFTER code changes when ANY condition is met:
 - Modified or added >50 lines
 - Refactored existing functionality

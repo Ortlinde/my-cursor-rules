@@ -14,6 +14,19 @@
 - After coding agent completes -> spawn **code-reviewer** (model: opus)
 - Main agent reads results and decides next action
 
+### Context Budget — Delegate Aggressively
+
+Claude Code has **no codebase indexing**. Every file read or search result is loaded directly
+into the main context window, which causes it to balloon rapidly and degrade performance.
+
+**Rule: Delegate all file reads, searches, and multi-file exploration to subagents.**
+
+- Use `Explore` agent for any codebase search, file discovery, or reading 3+ files
+- Use `general-purpose` agent for any task that requires reading + writing files
+- Main agent should only read files that are strictly necessary for coordination decisions
+- Prefer launching agents in parallel (single message, multiple tool calls) whenever tasks are independent
+- Never read a file in the main agent "just to understand context" — delegate that research
+
 ---
 
 ## Identity
