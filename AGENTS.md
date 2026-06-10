@@ -22,32 +22,6 @@ Usage notes:
 
 <available_skills>
 
-<!-- PROJECT-SPECIFIC skills (this project only, not copied globally) -->
-
-<skill>
-<name>coding-standards</name>
-<description>Invoke before writing, editing, or reviewing any Unity code to apply detailed style guides, naming conventions, architecture patterns, and refactoring strategies; also use when the user asks about code quality or best practices.</description>
-<location>project</location>
-</skill>
-
-<skill>
-<name>deliberate-development</name>
-<description>Enforce a 3-phase Understand->Design->Implement workflow when adding features, refactoring, or extending architectural components; requires conceptual analysis and design approval before any implementation begins.</description>
-<location>project</location>
-</skill>
-
-<skill>
-<name>self-review</name>
-<description>Run a standardized risk-and-compliance review after code modifications >50 lines or refactoring; generates a Self-Analysis Report and decides Proceed/Warn/Stop based on violation count against coding rules and postmortem patterns.</description>
-<location>project</location>
-</skill>
-
-<skill>
-<name>sharelogger-usage</name>
-<description>Replace Debug.Log, print(), and Console.WriteLine with ShareLogger.Instance.FuncInfo/Warn/Error when adding logs or reviewing Unity code; adds the required using WT.Foundation.Loggers namespace.</description>
-<location>project</location>
-</skill>
-
 <!-- CREATIVE-TOOLKIT plugin: Visual art, design, and media generation -->
 
 <skill>
