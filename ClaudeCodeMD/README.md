@@ -1,7 +1,6 @@
 # ClaudeCodeMD - Manual Placement Guide
 
 This directory contains Claude Code configuration files that must be placed **manually**.
-They are NOT handled by `setup.ps1`.
 
 ## File Placement
 
@@ -27,6 +26,6 @@ They are NOT handled by `setup.ps1`.
 
 ## Notes
 
-- **AGENTS.md** is handled automatically by `setup.ps1` (Step 5) — do not place manually.
+- **AGENTS.md** is in the repo root — copy to the project root if needed, or let `/syncSkills` regenerate it.
 - `CLAUDE.md` contains a hardcoded project name (`DHF2_Unity / Model.Unity`) — update it for each new project.
 - `~/.claude/` files apply to all Claude Code sessions across all projects.
