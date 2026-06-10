@@ -4,24 +4,23 @@ Cursor rules and postmortem knowledge base for Unity development. Claude Code sk
 
 ## 快速開始
 
-### 方式一：一鍵安裝（推薦）
+### 新專案設定
 
-在目標專案目錄中執行：
-
-```powershell
-# PowerShell
-irm https://raw.githubusercontent.com/Ortlinde/my-cursor-rules/main/setup.ps1 | iex
-```
-
-### 方式二：手動安裝
+**1. 複製 Cursor 規則**
 
 ```powershell
-# 1. Clone 此 repo
 git clone https://github.com/Ortlinde/my-cursor-rules.git
-
-# 2. 執行設定腳本
-.\my-cursor-rules\setup.ps1 -Target "D:\Workspace\YourProject"
+xcopy /E /Y "my-cursor-rules\.cursor" "YourProject\.cursor\"
 ```
+
+**2. 安裝 Claude Code Skills**
+
+```
+/plugin marketplace add Ortlinde/eztools
+/plugin install unity-dev-rules@ortlinde-tools
+```
+
+安裝後 `unity-dev-rules` 會在每次 session 自動將 skills 和 commands 安裝到 `~/.claude/`。
 
 ## 包含內容
 
@@ -64,10 +63,11 @@ git clone https://github.com/Ortlinde/my-cursor-rules.git
 
 ## 更新規則
 
-重新執行安裝腳本即可獲取最新規則：
+Pull 此 repo 後重新複製 `.cursor/` 到目標專案：
 
 ```powershell
-irm https://raw.githubusercontent.com/Ortlinde/my-cursor-rules/main/setup.ps1 | iex
+git -C my-cursor-rules pull
+xcopy /E /Y "my-cursor-rules\.cursor" "YourProject\.cursor\"
 ```
 
 ## 同步規則
