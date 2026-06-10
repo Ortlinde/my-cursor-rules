@@ -1,4 +1,4 @@
-# Project Rules: DHF2_Unity / Model.Unity
+# Project Rules: <Project_Name>
 
 > Global rules apply first. This file adds project-specific overrides and context.
 > Global rules: `~/.claude/CLAUDE.md` and `~/.claude/SUBAGENT.md`
