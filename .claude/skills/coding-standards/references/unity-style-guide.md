@@ -34,8 +34,8 @@ Order members in this sequence:
 2. **Serialized Fields**: `[SerializeField] private type _name`
 3. **Public Properties**: `public type Name { get; private set; }`
 4. **Private Fields**: `private type _name`
-5. **Unity Lifecycle**: `Awake`, `Start`, `OnEnable`, `OnDisable`, `Update`, `OnDestroy`
-6. **Public Methods**: Core functionality exposed to other classes
+5. **Public Methods**: Core functionality exposed to other classes
+6. **Unity Lifecycle**: `Awake`, `Start`, `OnEnable`, `OnDisable`, `Update`, `OnDestroy`
 7. **Private Methods**: Internal implementation details
 8. **Event Handlers**: Methods typically subscribed to events
 
@@ -56,7 +56,13 @@ public class PlayerHealth : MonoBehaviour
     // 4. Private Fields
     private float _lastDamageTime;
 
-    // 5. Unity Lifecycle
+    // 5. Public Methods
+    public void TakeDamage(float amount)
+    {
+        // ...
+    }
+
+    // 6. Unity Lifecycle
     private void Awake()
     {
         CurrentHealth = MAX_HP;
@@ -65,12 +71,6 @@ public class PlayerHealth : MonoBehaviour
     private void Update()
     {
         RegenerateHealth();
-    }
-
-    // 6. Public Methods
-    public void TakeDamage(float amount)
-    {
-        // ...
     }
 
     // 7. Private Methods

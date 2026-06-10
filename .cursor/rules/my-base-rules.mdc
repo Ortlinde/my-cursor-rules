@@ -47,8 +47,9 @@ alwaysApply: true
     3. Fields
     4. Properties
     5. Constructors
-    6. Normal Functions
+    6. Public Functions
     7. Unity Lifecycle Functions
+    8. Private Functions
   
   - 🔒 **Access Modifier Order** (within each block):
     1. [SerializeField] annotated members
@@ -117,9 +118,8 @@ public class Example : MonoBehaviour
     public Example() { }
     #endregion
 
-    #region Normal Functions
+    #region Public Functions
     public void Initialize() { }
-    private void InitializeInternal() { } // Called by Initialize
     #endregion
 
     #region Unity Lifecycle
@@ -131,6 +131,10 @@ public class Example : MonoBehaviour
     private void LateUpdate() { }
     private void OnDisable() { }
     private void OnDestroy() { }
+    #endregion
+
+    #region Private Functions
+    private void InitializeInternal() { }
     #endregion
 }
 ```

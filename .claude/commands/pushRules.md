@@ -22,16 +22,11 @@
        Remove-Item -Recurse -Force "$syncDir\.cursor\postmortem\project-specific"
    }
 
-   # Skills：僅複製 location:global 的 skill（讀 AGENTS.md 判斷）
-   # 解析 $projectDir\AGENTS.md，找出所有 <location>global</location> 的 skill name
-   # 對每個 global skill 執行：
-   xcopy /E /Y "$projectDir\.claude\skills\<skill-name>\*" "$syncDir\.claude\skills\<skill-name>\"
-
-   # AGENTS.md
-   Copy-Item -Path "$projectDir\AGENTS.md" -Destination "$syncDir\AGENTS.md" -Force
-
    # Commands (rules maintenance slash commands)
    xcopy /E /Y "$projectDir\.claude\commands\*" "$syncDir\.claude\commands\"
+
+   # AGENTS.md (template for other projects)
+   Copy-Item -Path "$projectDir\AGENTS.md" -Destination "$syncDir\AGENTS.md" -Force
 
    # Commit & Push
    Set-Location $syncDir

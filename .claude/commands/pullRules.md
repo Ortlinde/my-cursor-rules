@@ -21,15 +21,7 @@
    # Postmortem（排除 project-specific/）
    xcopy /E /Y /EXCLUDE:project-specific "$syncDir\.cursor\postmortem\*" "$projectDir\.cursor\postmortem\"
 
-   # Skills：僅複製 location:global 的 skill（讀 AGENTS.md 判斷）
-   # 解析 $syncDir\AGENTS.md，找出所有 <location>global</location> 的 skill name
-   # 對每個 global skill 執行：
-   xcopy /E /Y "$syncDir\.claude\skills\<skill-name>\*" "$projectDir\.claude\skills\<skill-name>\"
-
-   # AGENTS.md
-   Copy-Item -Path "$syncDir\AGENTS.md" -Destination "$projectDir\AGENTS.md" -Force
-
-   # Commands (rules maintenance slash commands)
+   # Commands
    xcopy /E /Y "$syncDir\.claude\commands\*" "$projectDir\.claude\commands\"
    ```
 
