@@ -27,5 +27,6 @@ This directory contains Claude Code configuration files that must be placed **ma
 ## Notes
 
 - **AGENTS.md** is in the repo root — copy to the project root if needed, or let `/syncSkills` regenerate it.
-- `CLAUDE.md` contains a hardcoded project name (`DHF2_Unity / Model.Unity`) — update it for each new project.
+- `CLAUDE.md` uses `<Project_Name>` as a placeholder — replace it after copying to each project.
 - `~/.claude/` files apply to all Claude Code sessions across all projects.
+- **Project-specific skills** (e.g. `sharelogger-usage`) are NOT installed globally. Copy them manually to `<project-root>/.claude/skills/` for projects that need them. Source: `d:\Workspace\eztools\plugin\unity-dev-rules\skills\`.

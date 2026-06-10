@@ -8,20 +8,7 @@
 ## Project Context
 
 - Unity project, Windows, C#
-- Framework: WT.Foundation, WT.FrameSync.FishWeb (DLL)
 - Skills registry: `AGENTS.md`
-
----
-
-## Logging (Project Override)
-
-NEVER use Debug.Log, Debug.LogWarning, Debug.LogError, print(), or Console.WriteLine.
-
-ALWAYS use ShareLogger:
-- Add: `using WT.Foundation.Loggers;`
-- Use: `ShareLogger.Instance.FuncInfo()` / `.Warn()` / `.Error()`
-
-Skill: `.claude/skills/sharelogger-usage/SKILL.md`
 
 ---
 
